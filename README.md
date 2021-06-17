@@ -1,9 +1,9 @@
 # gtd-review
-### _Your Name <your.name@example.com>_
+### _Jonathan A. Bennett <doulos05@gmail.com_
 
-This is a project to do ... something.
+This is a suite of tools to guide a user through a thorough weekly review using Taskwarrior to store active tasks.
 
 ## License
 
-Specify license here
+MIT
 
