@@ -1,0 +1,33 @@
+;;;; gtd-review.lisp
+
+;; Plan for this script
+;; This will be an on-exit hook for taskwarrior.
+;; Its purpose is to update my current list of projects.
+;; The first time it is run, it stores the list in a file.
+;; On subsequent runs, it adds any new projects to the file.
+;; The weekly review package will be the package where this data gets used.
+;; All data for this suite of tools lives by default in ~/.cl-gtd
+;; All data for this script is stored in ~/.cl-gtd/projects.txt
+
+
+(in-package #:gtd-review)
+(defparameter *projects-filepath* (uiop:native-namestring "~/.cl-gtd/projects.txt"))
+
+(defun get-new-projects-list ()
+  "Gets a list of the current projects from taskwarrior."
+ (inferior-shell:run "task _projects"))
+
+(defun get-current-projects-list (file)
+  "Get the last list of projects for the datafile."
+  (uiop:read-file-lines file))
+
+
+(defun merge-projects-lists (curr new)
+  "Merge the two lists using union"
+  (union curr new :test `equalp))
+
+(defvar current-projects (get-current-projects-list (*projects-filepath*)))
+(defvar new-projects (get-new-projects-list))
+(defvar updated-projects (merge-projects-lists current-projects new-projects))
+(with-open-file (file *projects-filepath* :direction :output :if-exists :supersede)
+  (format file "~{~A~%~}~%" updated-projects))
