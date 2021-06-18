@@ -19,8 +19,7 @@
 
 (defun get-current-projects-list (file)
   "Get the last list of projects for the datafile."
-  (let (data (uiop:read-file-lines file))
-    (remove "" data :test `equal)))
+  (uiop:read-file-lines *projects-filepath*))
 
 
 (defun merge-projects-lists (curr new)
