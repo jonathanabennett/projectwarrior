@@ -14,19 +14,20 @@
 (defparameter *projects-filepath* (uiop:native-namestring "~/.cl-gtd/projects.txt"))
 
 (defun get-new-projects-list ()
-  "Gets a list of the current projects from taskwarrior."
+  "Gets a list of the current projects from taskwarrior. rc.hooks=off is needed to prevent infinite loops."
  (inferior-shell:run/lines "task _projects rc.hooks=off"))
 
 (defun get-current-projects-list (file)
-  "Get the last list of projects for the datafile."
+  "Get the last list of projects for *projects-filepath*."
   (uiop:read-file-lines *projects-filepath*))
 
 
 (defun merge-projects-lists (curr new)
-  "Merge the two lists using union"
+  "Merge two lists of strings."
   (union curr new :test `equal))
 
 (defun main ()
+  "This is the script entry point."
   (let* ((current-projects (get-current-projects-list *projects-filepath*))
          (new-projects (get-new-projects-list))
          (updated-projects (merge-projects-lists current-projects new-projects)))
