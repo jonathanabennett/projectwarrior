@@ -25,10 +25,12 @@
 
 (defun merge-projects-lists (curr new)
   "Merge the two lists using union"
-  (union curr new :test `equalp))
+  (union curr new :test `equal))
 
-(defvar current-projects (get-current-projects-list (*projects-filepath*)))
-(defvar new-projects (get-new-projects-list))
-(defvar updated-projects (merge-projects-lists current-projects new-projects))
-(with-open-file (file *projects-filepath* :direction :output :if-exists :supersede)
-  (format file "~{~A~%~}~%" updated-projects))
+(defun main ()
+  (let* ((current-projects (get-current-projects-list *projects-filepath*))
+         (new-projects (get-new-projects-list))
+         (updated-projects (merge-projects-lists current-projects new-projects)))
+    (with-open-file (file *projects-filepath* :direction :output :if-exists :supersede)
+      (format file "~{~A~%~}" updated-projects))
+    ()))
