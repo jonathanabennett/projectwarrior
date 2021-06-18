@@ -1,5 +1,7 @@
 ;;;; package.lisp
 
-(defpackage #:gtd-review
+(defpackage :gtd-review
   (:use #:cl)
-  (:export #:main))
+  (:export #:main
+           #:merge-lists
+           #:get-list-from-file))

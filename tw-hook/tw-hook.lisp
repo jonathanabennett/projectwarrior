@@ -13,15 +13,11 @@
   "Retrieve taskwarrior's current list of projects."
   (inferior-shell:run/lines "task _projects rc.hooks=off"))
 
-(defun merge-projects-lists (curr new)
-  "Produce the union of taskwarrior's list and the saved list."
-  (union curr new :test `equal))
-
 (defun main ()
   "Entry point for the hook."
-  (let* ((current-projects (uiop:read-file-lines *projects-filepath*))
+  (let* ((current-projects (gtd-review:get-list-from-file *projects-filepath*))
          (new-projects (get-new-projects-list))
-         (updated-projects (merge-projects-lists current-projects new-projects)))
+         (updated-projects (gtd-review:merge-lists current-projects new-projects)))
     (with-open-file (file *projects-filepath* :direction :output :if-exists :supersede)
       (format file "~{~A~%~}" updated-projects))
     ()))
