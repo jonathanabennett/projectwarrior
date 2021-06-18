@@ -1,16 +1,17 @@
 ;;;; gtd-review.lisp
 
-;; Plan for this script
-;; This will be an on-exit hook for taskwarrior.
-;; Its purpose is to update my current list of projects.
-;; The first time it is run, it stores the list in a file.
-;; On subsequent runs, it adds any new projects to the file.
-;; The weekly review package will be the package where this data gets used.
-;; All data for this suite of tools lives by default in ~/.cl-gtd
-;; All data for this script is stored in ~/.cl-gtd/projects.txt
+;;; Plan for this script
+;;; This will be an on-exit hook for taskwarrior.
+;;; Its purpose is to update my current list of projects.
+;;; The first time it is run, it stores the list in a file.
+;;; On subsequent runs, it adds any new projects to the file.
+;;; The weekly review package will be the package where this data gets used.
+;;; All data for this suite of tools lives by default in ~/.cl-gtd
+;;; All data for this script is stored in ~/.cl-gtd/projects.txt
 
 
 (in-package #:gtd-review)
+
 (defparameter *projects-filepath* (uiop:native-namestring "~/.cl-gtd/projects.txt"))
 
 (defun get-new-projects-list ()
@@ -19,8 +20,7 @@
 
 (defun get-current-projects-list (file)
   "Get the last list of projects for *projects-filepath*."
-  (uiop:read-file-lines *projects-filepath*))
-
+  (uiop:read-file-lines file))
 
 (defun merge-projects-lists (curr new)
   "Merge two lists of strings."
