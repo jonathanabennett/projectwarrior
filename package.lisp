@@ -2,4 +2,5 @@
 
 (defpackage #:gtd-review
   (:use #:cl)
-  (:use #:inferior-shell))
+  (:use #:inferior-shell)
+  (:export #:main))
