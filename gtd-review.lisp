@@ -15,7 +15,7 @@
 
 (defun get-new-projects-list ()
   "Gets a list of the current projects from taskwarrior."
- (inferior-shell:run "task _projects"))
+ (inferior-shell:run/lines "task _projects rc.hooks=off"))
 
 (defun get-current-projects-list (file)
   "Get the last list of projects for the datafile."
