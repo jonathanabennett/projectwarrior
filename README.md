@@ -13,7 +13,7 @@ MIT
 These instructions assume you have Steel Bank Common Lisp and Quicklisp installed and configured on your system. This should work with any Common Lisp, but has only been tested on SBCL
 
 1. Clone the repository into your local-projects folder (typically `~/quicklisp/local-projects`).
-2. Launch `sbcl` and run `(asdf:make "gtd-review")`
+2. Launch `sbcl` and run `(asdf:make "gtd-review/tw-hook")`
 3. `mkdir ~/.cl-gtd` and `touch ~/.cl-gtd/projects.txt`
 4. `mv ~/quicklisp/local-projects/gtd-review/on-exit-projects-list ~/.task/hooks/`
 
