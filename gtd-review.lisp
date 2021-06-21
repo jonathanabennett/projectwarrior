@@ -26,19 +26,21 @@
   "Gets a list of the current projects from taskwarrior. rc.hooks=off is needed to prevent infinite loops."
  (inferior-shell:run/lines "task _projects rc.hooks=off"))
 
-(defun get-current-projects-list (file)
-  "Get the last list of projects for *projects-filepath*."
-  (uiop:read-file-lines file))
-
-(defun merge-projects-lists (curr new)
-  "Merge two lists of strings."
-  (union curr new :test `equal))
 
 (defun main ()
   "This is the script entry point."
-  (let* ((current-projects (get-current-projects-list *projects-filepath*))
-         (new-projects (get-new-projects-list))
-         (updated-projects (merge-projects-lists current-projects new-projects)))
-    (with-open-file (file *projects-filepath* :direction :output :if-exists :supersede)
-      (format file "~{~A~%~}" updated-projects))
-    ()))
+  (format t "Welcome to your project review. Hold on while sync your projects.")
+  (sync-projects-list *projects-filepath*)
+  (let ((active-projects ())
+        (review-list (get-list-from-file *projects-filepath*)))
+    (dolist (project review-list)
+      (progn
+        (format t "Project: ~A~%" project)
+        (format t "Run the following command in another window to everything in taskwarrior for this project.")
+        (uiop:run-program (format nil "task project:~A and '(status:PENDING or status:WAITING)' all" project) :ignore-error-status t :output *standard-output*)
+        (let ((response (ask "Is your project [a]ctive, [c]ompleted, or [d]eleted? ")))
+          (if (equal response "a")
+              (push project active-projects)))
+        ))
+    (with-open-file (f *projects-filepath* :direction :output :if-exists :supersede)
+      (format f "~{~A~%~}" active-projects))))
