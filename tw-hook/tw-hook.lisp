@@ -7,7 +7,7 @@
 
 (in-package #:tw-hook)
 
-(defparameter *projects-filepath* (uiop:native-namestring "~/.cl-gtd/projects.txt "))
+(defparameter *projects-filepath* (uiop:native-namestring "~/.cl-gtd/projects.txt"))
 
 (defun get-new-projects-list ()
   "Retrieve taskwarrior's current list of projects."
@@ -15,9 +15,9 @@
 
 (defun main ()
   "Entry point for the hook."
-  (let* ((current-projects (gtd-review:get-list-from-file *projects-filepath*))
-         (new-projects (get-new-projects-list))
-         (updated-projects (gtd-review:merge-lists current-projects new-projects)))
+  (let* ((current-projects (GTD-REVIEW:get-list-from-file *projects-filepath*))
+         (new-projects (GTD-REVIEW:get-new-projects-list))
+         (updated-projects (GTD-REVIEW:merge-lists current-projects new-projects)))
     (with-open-file (file *projects-filepath* :direction :output :if-exists :supersede)
       (format file "~{~A~%~}" updated-projects))
     ()))
