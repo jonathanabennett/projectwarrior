@@ -10,7 +10,10 @@
   :components
   ((:file "package")
    (:file "utils" :depends-on ("package"))
-   (:file "gtd-review" :depends-on ("package"))))
+   (:file "gtd-review" :depends-on ("package")))
+  :build-operation :program-op
+  :build-pathname "gtd-review"
+  :entry-point "gtd-review:main")
 
 (asdf:defsystem #:gtd-review/tw-hook
   :description "This simple hook for Taskwarrior adds newly created projects to a projects.txt file for use in a weekly review."
