@@ -21,5 +21,11 @@ hook:
 		--eval '(quit)'
 	mv ./on-exit-projects-list ~/.task/hooks/on-exit-projects-list
 
+install:
+	$(LISP) --load gtd-review.asd \
+		--eval '(ql:quickload :gtd-review)' \
+		--eval '(asdf:make :gtd-review)' \
+		--eval '(quit)'
+		echo "Please move the gtd-review executable somewhere on your PATH"
 
 # end
