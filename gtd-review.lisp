@@ -37,7 +37,7 @@
       (progn
         (format t "Project: ~A~%" project)
         (format t "Run the following command in another window to everything in taskwarrior for this project.")
-        (uiop:run-program (format nil "task project:~A and '(status:PENDING or status:WAITING)' all" project) :ignore-error-status t :output *standard-output*)
+        (uiop:run-program (format nil "task project:~A and '(status:PENDING or status:WAITING)' all rc.hooks=off" project) :ignore-error-status t :output *standard-output*)
         (let ((response (ask "Is your project [a]ctive, [c]ompleted, or [d]eleted? ")))
           (if (equal response "a")
               (push project active-projects)))
