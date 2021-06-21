@@ -1,1 +1,3 @@
 *.fasl
+/on-exit-projects-list
+/gtd-review
