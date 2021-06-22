@@ -20,13 +20,6 @@
 
 (in-package #:gtd-review)
 
-(defparameter *projects-filepath* (uiop:native-namestring "~/.cl-gtd/projects.txt"))
-
-(defun get-new-projects-list ()
-  "Gets a list of the current projects from taskwarrior. rc.hooks=off is needed to prevent infinite loops."
- (inferior-shell:run/lines "task _projects rc.hooks=off"))
-
-
 (defun main ()
   "This is the script entry point."
   (format t "Welcome to your project review. Hold on while sync your projects.")
