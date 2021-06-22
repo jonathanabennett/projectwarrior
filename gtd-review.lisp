@@ -20,13 +20,6 @@
 
 (in-package #:gtd-review)
 
-(defparameter *projects-filepath* (uiop:native-namestring "~/.cl-gtd/projects.txt"))
-
-(defun get-new-projects-list ()
-  "Gets a list of the current projects from taskwarrior. rc.hooks=off is needed to prevent infinite loops."
- (inferior-shell:run/lines "task _projects rc.hooks=off"))
-
-
 (defun main ()
   "This is the script entry point."
   (format t "Welcome to your project review. Hold on while sync your projects.")
@@ -36,7 +29,6 @@
     (dolist (project review-list)
       (progn
         (format t "Project: ~A~%" project)
-        (format t "Run the following command in another window to everything in taskwarrior for this project.")
         (uiop:run-program (format nil "task project:~A and '(status:PENDING or status:WAITING)' all rc.hooks=off" project) :ignore-error-status t :output *standard-output*)
         (let ((response (ask "Is your project [a]ctive, [c]ompleted, or [d]eleted? ")))
           (if (equal response "a")

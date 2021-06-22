@@ -15,14 +15,16 @@ LISP ?= sbcl
 hook:
 	mkdir -p ~/.cl-gtd
 	touch ~/.cl-gtd/projects.txt
-	$(LISP) --load gtd-review.asd \
+	$(LISP) --eval "(require 'asdf)" \
+		--load gtd-review.asd \
 		--eval '(ql:quickload :gtd-review/tw-hook)' \
 		--eval '(asdf:make :gtd-review/tw-hook)' \
 		--eval '(quit)'
 	mv ./on-exit-projects-list ~/.task/hooks/on-exit-projects-list
 
 install:
-	$(LISP) --load gtd-review.asd \
+	$(LISP) --eval "(require 'asdf)" \
+		--load gtd-review.asd \
 		--eval '(ql:quickload :gtd-review)' \
 		--eval '(asdf:make :gtd-review)' \
 		--eval '(quit)'

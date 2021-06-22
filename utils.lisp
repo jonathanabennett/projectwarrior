@@ -6,7 +6,7 @@
 
 (defun get-new-projects-list ()
   "Gets a list of the current projects from taskwarrior. rc.hooks=off is needed to prevent infinite loops."
- (inferior-shell:run/lines "task _projects rc.hooks=off"))
+ (uiop:run-program "task _projects rc.hooks=off"))
 
 (defun merge-lists (lst1 lst2)
   "Merge two lists of strings together, returning the union of the two lists."
