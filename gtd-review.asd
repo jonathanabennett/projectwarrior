@@ -6,7 +6,7 @@
   :license "MIT"
   :version "0.0.2"
   :serial t
-  :depends-on ("inferior-shell")
+  :depends-on ("yason")
   :components
   ((:file "package")
    (:file "utils" :depends-on ("package"))
@@ -21,7 +21,7 @@
   :license "MIT"
   :version "0.0.1"
   :serial t
-  :depends-on ("inferior-shell" "gtd-review")
+  :depends-on ("gtd-review")
   :components ((:file "tw-hook/package")
                (:file "tw-hook/tw-hook"))
   :build-operation :program-op
