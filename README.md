@@ -10,7 +10,14 @@ MIT
 
 ## Installation
 
-These instructions assume you have Steel Bank Common Lisp and Quicklisp installed and configured on your system. This should work with any Common Lisp, but has only been tested on SBCL
+### Prerequisites
+
+GTD-review is written in Common Lisp and requires a basic Common Lisp setup in order to run. Ensure that the following are correctly configured on your system:
+
+1. [sbcl](http://www.sbcl.org/index.html) Steel Bank Common Lisp (GTD-Review should work with other Common Lisps, but has not been tested).
+2. [Quicklisp](https://www.quicklisp.org/beta/), the package manager for Common Lisp. This is used to download and install any 3rd party Common Lisp systems needed for GTD-Review to run.
+
+Once you have SBCL and Quicklisp setup according to the instructions on their website, follow the steps below to install GTD-review.
 
 1. Clone the repository into your local-projects folder (typically `~/quicklisp/local-projects`).
 2. `make install` to create the gtd-review executable.
