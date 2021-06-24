@@ -52,3 +52,13 @@
   (format t "Project should be in the same format as a taskwarrior project.")
   (format t "help: Display this message.")
   (format t "review: Review your tasks."))
+
+(defun main (&rest argv)
+  (declare (ignore argv))
+  "This is the script entry point."
+  (let ((args (uiop/image:command-line-arguments)))
+     (cond
+       ((equal (car args) "help") (help))
+       ((equal (car args) "add") (add (car (cdr args))))
+       ((equal (car args) "review") (review))
+       (t (review)))))
