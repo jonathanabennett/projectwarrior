@@ -22,7 +22,9 @@ hook:
 		--eval '(quit)'
 	mv ./on-exit-projects-list ~/.task/hooks/on-exit-projects-list
 
-install:
+build:
+	mkdir -p ~/.cl-gtd
+	touch ~/.cl-gtd/projects.txt
 	$(LISP) --eval "(require 'asdf)" \
 		--load gtd-review.asd \
 		--eval '(ql:quickload :gtd-review)' \
