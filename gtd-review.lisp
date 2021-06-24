@@ -21,6 +21,7 @@
 (in-package #:gtd-review)
 
 (defun list-tasks (project)
+  "Retrieve a json list of tasks and parse them into Task objects."
   (let ((tasks (yason:parse (uiop:run-program (format nil "task project:~A and '(status:PENDING or status:WAITING)' export rc.hooks=off" project) :ignore-error-status t :output :string))))
     (print tasks)))
 
@@ -47,6 +48,7 @@
       (format f "~{~A~%~}" active-projects))))
 
 (defun help ()
+  "Print out the help."
   (format t "USAGE: ./gtd-review <subcommand> <project>")
   (format t "add <project>: Add <project> as a project.")
   (format t "Project should be in the same format as a taskwarrior project.")
@@ -54,8 +56,8 @@
   (format t "review: Review your tasks."))
 
 (defun main (&rest argv)
-  (declare (ignore argv))
   "This is the script entry point."
+  (declare (ignore argv))
   (let ((args (uiop/image:command-line-arguments)))
      (cond
        ((equal (car args) "help") (help))

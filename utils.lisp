@@ -19,6 +19,7 @@
   (uiop:read-file-lines file))
 
 (defun sync-projects-list (file)
+  "Compare the list of projects stored in gtd-review to the list of projects from taskwarrior and keep the union of these two sets"
   (let* ((current-projects (get-list-from-file file))
          (new-projects (get-new-projects-list))
          (updated-projects (merge-lists current-projects new-projects)))
@@ -26,6 +27,7 @@
       (format dest "~{~A~%~}" updated-projects))))
 
 (defun ask (&optional (message "Input: "))
+  "Ask the user for input. Handles setup and wrap-up to ensure that the user's input is captured."
   (clear-input)
   (write-string message)
   (finish-output)
