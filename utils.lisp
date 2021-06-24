@@ -10,7 +10,7 @@
 
 (defun merge-lists (lst1 lst2)
   "Merge two lists of strings together, returning the union of the two lists."
-  (union lst1 lst2 :test `equal))
+  (union lst1 lst2 :test 'equal))
 
 (defun get-list-from-file (file)
   "Retrieve a list of strings from a file, each line of the file as its own string."
