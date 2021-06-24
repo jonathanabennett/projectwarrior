@@ -20,8 +20,17 @@
 
 (in-package #:gtd-review)
 
-(defun main ()
-  "This is the script entry point."
+(defun list-tasks (project)
+  (let ((tasks (yason:parse (uiop:run-program (format nil "task project:~A and '(status:PENDING or status:WAITING)' export rc.hooks=off" project) :ignore-error-status t :output :string))))
+    (print tasks)))
+
+(defun add (project)
+  "This adds a new project to the file identified in *projects-filepath*."
+  (with-open-file (f *projects-filepath* :direction :output :if-exists :append)
+    (format f "~&~A~%" project)))
+
+(defun review ()
+  "This guides a user through a review of the projects listed in their *projects-filepath* file."
   (format t "Welcome to your project review. Hold on while sync your projects.")
   (sync-projects-list *projects-filepath*)
   (let ((active-projects ())
@@ -36,3 +45,10 @@
         ))
     (with-open-file (f *projects-filepath* :direction :output :if-exists :supersede)
       (format f "~{~A~%~}" active-projects))))
+
+(defun help ()
+  (format t "USAGE: ./gtd-review <subcommand> <project>")
+  (format t "add <project>: Add <project> as a project.")
+  (format t "Project should be in the same format as a taskwarrior project.")
+  (format t "help: Display this message.")
+  (format t "review: Review your tasks."))
