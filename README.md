@@ -10,21 +10,35 @@ MIT
 
 ## Installation
 
-These instructions assume you have Steel Bank Common Lisp and Quicklisp installed and configured on your system. This should work with any Common Lisp, but has only been tested on SBCL
+### Prerequisites
+
+GTD-review is written in Common Lisp and requires a basic Common Lisp setup in order to run. Ensure that the following are correctly configured on your system:
+
+1. [sbcl](http://www.sbcl.org/index.html) Steel Bank Common Lisp (GTD-Review should work with other Common Lisps, but has not been tested).
+2. [Quicklisp](https://www.quicklisp.org/beta/), the package manager for Common Lisp. This is used to download and install any 3rd party Common Lisp systems needed for GTD-Review to run.
+
+Once you have SBCL and Quicklisp setup according to the instructions on their website, follow the steps below to install GTD-review.
 
 1. Clone the repository into your local-projects folder (typically `~/quicklisp/local-projects`).
-2. `make install` to create the gtd-review executable.
-3. (Optional) `make hook` to create and install the `taskwarrior` on-exit hook.
+2. `make build` to create the gtd-review executable.
+3. Copy the `gtd-review` file somewhere in your path.
+4. (Optional) `make hook` to create and install the `taskwarrior` on-exit hook.
 
 ## Usage
 
-Run `gtd-review` to trigger a review of your projects. When this is called, the projects in your `projects.txt` file will be displayed one by one and the taskwarrior command `task project:<project> and (status:PENDING or status:WAITING) all` will be called. This gives you a list of pending and waiting tasks for this project. Review this list and evaluate the project for yourself. Do the tasks currently captured in taskwarrior represent everything you need to do with this project? Are any of these tasks stale? Using a _separate_ terminal window, add/modify/complete/delete any tasks that need to be added/modified/completed/deleted in taskwarrior. Finally, mark the project as:
+### Add
+
+Run `gtd-revew add <project>` to add `<project>` to the `/.cl-gtd/projects.txt` file. `<project>` should be in a format acceptable to Taskwarrior as a project (no spaces). This adds nothing to taskwarrior, but it does ensure that you will see this project when you do your next review.
+
+### Review
+
+Run `gtd-review` or `gtd-review review` to trigger a review of your projects. When this is called, the projects in your `projects.txt` file will be displayed one by one and the taskwarrior command `task project.is:<project> and (status:PENDING or status:WAITING) all` will be called. This gives you a list of pending and waiting tasks for this project. Review this list and evaluate the project for yourself. Do the tasks currently captured in taskwarrior represent everything you need to do with this project? Are any of these tasks stale? Using a _separate_ terminal window, add/modify/complete/delete any tasks that need to be added/modified/completed/deleted in taskwarrior. Finally, mark the project as:
 
 - [a]ctive: This project is still part of my productivity landscape and should remain in my system.
 - [c]ompleted: This project is complete and can be removed from my system.
 - [d]eleted: This project is no longer relevant and can be removed from my system.
 
-**NOTE** As of version 0.0.2, Complete and Delete have the same behavior! A future release will have different behavior for these two items.
+**NOTE** As of version 0.1.0, Complete and Delete have the same behavior! A future release will have different behavior for these two items.
 
 **NOTE 2** This project makes _ZERO_ changes to your taskwarrior tasks. If you mark a project completed or deleted, make the matching edits to your taskwarrior tasks. A future release may add an option to perform this for you.
 
@@ -48,16 +62,13 @@ As such, this program works best when used in conjunction with the optional on-e
 
 ## Roadmap
 
-### 0.0.3
-
-- Add ability to create tasks for projects directly from the project review interface.
-
 ### 0.1.0
 
-- Add ability to create new projects (and associated tasks) from the project review interface).
+This release.
 
 ### 0.1.1
 
+- Allow users to input tasks into taskwarrior while reviewing projects
 - Weekly review interface to prompt the user through a weekly review following a fixed script.
 
 ### 0.1.2
@@ -67,3 +78,11 @@ As such, this program works best when used in conjunction with the optional on-e
 ### 0.2.0
 
 - Weekly Review feature should be complete.
+
+### 0.3
+
+- Improve storage backend for projects, capturing more metadata about each project.
+
+### 0.4
+
+- Use metadata to automatically add metadata to created tasks in taskwarrior (if a project has the @computer tag, then so do tasks created from it in gtd-review)
