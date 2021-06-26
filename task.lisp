@@ -61,9 +61,6 @@ Taskwarrior passes in all kinds of additional information, we ignore it as we do
   "Compare two tasks and sort them based on urgency."
   (> (urgency t1) (urgency t2)))
 
-(defgeneric display (object)
-  "Display an object")
-
 (defmethod display ((tsk task))
   "Formats tasks for display on the string TSK is a `TASK' object."
   (format nil "~0,1,5A~0,1,5A~a" (task-desc tsk) (task-status tsk) (urgency tsk)))
