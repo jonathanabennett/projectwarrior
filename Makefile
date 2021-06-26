@@ -32,4 +32,6 @@ build:
 		--eval '(quit)'
 		echo "Please move the gtd-review executable somewhere on your PATH"
 
+install:
+	mv gtd-review ~/.bin/
 # end
