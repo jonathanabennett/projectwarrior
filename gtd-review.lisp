@@ -42,10 +42,13 @@
     (dolist (project review-list)
       (progn
         (format t "~%~%~%~%Project: ~A~%" project)
-        (uiop:run-program (format nil "task project.is:~A and '(status:PENDING or status:WAITING)' all rc.hooks=off" project) :ignore-error-status t :output *standard-output*)
+        (list-tasks project)
         (let ((response (ask "Is your project [a]ctive, [c]ompleted, or [d]eleted? ")))
-          (if (equal response "a")
-              (push project active-projects)))
+          (cond
+            ((equal response "a") (push project active-projects))
+            ((equal response "c") ())
+            ((equal response "d") ())
+            (t (push project active-projects))))
         ))
     (with-open-file (f *projects-filepath* :direction :output :if-exists :supersede)
       (format f "~{~A~%~}" active-projects))))
