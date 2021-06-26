@@ -6,10 +6,12 @@
   :license "MIT"
   :version "0.1.0"
   :serial t
-  :depends-on ("yason")
+  :depends-on ("yason" "cl-ascii-table")
   :components
   ((:file "package")
    (:file "utils" :depends-on ("package"))
+   (:file "task" :depends-on ("package"))
+   (:file "project" :depends-on ("package"))
    (:file "gtd-review" :depends-on ("package")))
   :build-operation :program-op
   :build-pathname "gtd-review"

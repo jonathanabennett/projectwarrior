@@ -22,8 +22,11 @@
 
 (defun list-tasks (project)
   "Retrieve a json list of tasks and parse them into Task objects."
-  (let ((tasks (yason:parse (uiop:run-program (format nil "task project:~A and '(status:PENDING or status:WAITING)' export rc.hooks=off" project) :ignore-error-status t :output :string))))
-    (print tasks)))
+  (let ((tasks (yason:parse (uiop:run-program (format nil "task project.is:~A and '(status:PENDING or status:WAITING)' export rc.hooks=off" project) :ignore-error-status t :output :string)))
+        (table (ascii-table:make-table `("Description" "Status" "Urgency") :header project)))
+    (dolist (task tasks)
+       (ascii-table:add-row table (list (gethash "description" task) (gethash "status" task) (gethash "urgency" task))))
+    (ascii-table:display table)))
 
 (defun add (project)
   "This adds a new project to the file identified in *projects-filepath*."
