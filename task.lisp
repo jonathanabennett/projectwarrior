@@ -63,7 +63,8 @@ Taskwarrior passes in all kinds of additional information, we ignore it as we do
 
 (defmethod display ((tsk task))
   "Formats tasks for display on the string TSK is a `TASK' object."
-  (format nil "~0,1,5A~0,1,5A~a" (task-desc tsk) (task-status tsk) (urgency tsk)))
+  (let ((width (uiop:getenv "COLUMNS")))
+    (format nil "~0,1,10A~,0,1,10A~A" (task-desc tsk) (task-status tsk) (urgency tsk))))
 
 (defun task-from-hash (t-hash)
   "Given a hash as produced by taskwarrior export, create a `TASK' instance. T-HASH must be a hash."
