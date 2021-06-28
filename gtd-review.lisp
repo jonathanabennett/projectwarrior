@@ -43,7 +43,7 @@
       (progn
         (format t "~%~%~%~%Project: ~A~%" project)
         (list-tasks project)
-        (let ((response (ask "Is your project [a]ctive, [c]ompleted, or [d]eleted? ")))
+        (let ((response (ask-until-valid '("a" "b" "d") "Is your project [a]ctive, [c]ompleted, or [d]eleted? ")))
           (cond
             ((equal response "a") (push project active-projects))
             ((equal response "c") ())

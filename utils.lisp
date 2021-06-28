@@ -26,9 +26,15 @@
     (with-open-file (dest file :direction :output :if-exists :supersede)
       (format dest "~{~A~%~}" updated-projects))))
 
-(defun ask (&optional (message "Input: "))
-  "Ask the user for input. Handles setup and wrap-up to ensure that the user's input is captured."
-  (clear-input)
-  (write-string message)
-  (finish-output)
-  (read-line))
+(defun ask-until-valid (valid-response-list prompt)
+  "Ask the user to input until they give a response that is in the `VALID-RESPONSE-LIST'."
+  (loop with answer = nil
+        with response = nil
+        while (null response)
+        if (member answer valid-response-list :test 'equal)
+          do (setq response answer)
+        else do (clear-input)
+                (write-string prompt)
+                (finish-output)
+                (setq answer (read-line))
+        finally (return answer)))
