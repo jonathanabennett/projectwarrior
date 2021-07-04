@@ -9,9 +9,4 @@
 
 (defun main ()
   "Entry point for the hook."
-  (let* ((current-projects (GTD-REVIEW:get-list-from-file GTD-REVIEW:*projects-filepath*))
-         (new-projects (GTD-REVIEW:get-new-projects-list))
-         (updated-projects (GTD-REVIEW:merge-lists current-projects new-projects)))
-    (with-open-file (file GTD-REVIEW:*projects-filepath* :direction :output :if-exists :supersede)
-      (format file "~{~A~%~}" updated-projects))
-    ()))
+  (GTD-REVIEW:sync-projects-list GTD-REVIEW:*projects-filepath*))
