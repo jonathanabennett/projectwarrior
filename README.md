@@ -21,7 +21,7 @@ Once you have SBCL and Quicklisp setup according to the instructions on their we
 
 1. Clone the repository into your local-projects folder (typically `~/quicklisp/local-projects`).
 2. `make build` to create the gtd-review executable.
-3. Copy the `gtd-review` file somewhere in your path.
+3. `make install` to copy the `gtd-review` executable to `~/.bin`. If you need it to be elsewhere to be on your path, please skip this step and manually copy it.
 4. (Optional) `make hook` to create and install the `taskwarrior` on-exit hook.
 
 ## Usage
@@ -30,17 +30,23 @@ Once you have SBCL and Quicklisp setup according to the instructions on their we
 
 Run `gtd-revew add <project>` to add `<project>` to the `/.cl-gtd/projects.txt` file. `<project>` should be in a format acceptable to Taskwarrior as a project (no spaces). This adds nothing to taskwarrior, but it does ensure that you will see this project when you do your next review.
 
-### Review
+### Projects
 
-Run `gtd-review` or `gtd-review review` to trigger a review of your projects. When this is called, the projects in your `projects.txt` file will be displayed one by one and the taskwarrior command `task project.is:<project> and (status:PENDING or status:WAITING) all` will be called. This gives you a list of pending and waiting tasks for this project. Review this list and evaluate the project for yourself. Do the tasks currently captured in taskwarrior represent everything you need to do with this project? Are any of these tasks stale? Using a _separate_ terminal window, add/modify/complete/delete any tasks that need to be added/modified/completed/deleted in taskwarrior. Finally, mark the project as:
+Run `gtd-review projects` to trigger a review of your projects. When this is called, the projects in your `projects.txt` file will be displayed one by one and the taskwarrior command `task project.is:<project> and (status:PENDING or status:WAITING) all` will be called. This gives you a list of pending and waiting tasks for this project. Review this list and evaluate the project for yourself. Do the tasks currently captured in taskwarrior represent everything you need to do with this project? Are any of these tasks stale? Using a _separate_ terminal window, add/modify/complete/delete any tasks that need to be added/modified/completed/deleted in taskwarrior. Finally, mark the project as:
 
 - [a]ctive: This project is still part of my productivity landscape and should remain in my system.
 - [c]ompleted: This project is complete and can be removed from my system.
 - [d]eleted: This project is no longer relevant and can be removed from my system.
 
-**NOTE** As of version 0.1.0, Complete and Delete have the same behavior! A future release will have different behavior for these two items.
+**NOTE** As of version 0.2.0, Complete and Delete have the same behavior! A future release will have different behavior for these two items.
 
-**NOTE 2** This project makes _ZERO_ changes to your taskwarrior tasks. If you mark a project completed or deleted, make the matching edits to your taskwarrior tasks. A future release may add an option to perform this for you.
+**NOTE 2** This project does not mark tasks done or deleted in taskwarrior for you. If you mark a project completed or deleted, make the matching edits to your taskwarrior tasks immediately (before completing the review). A future release may add an option to perform this for you.
+
+### Review
+
+This is the meat of the program. This guides you through a weekly review checklist, ensuring at the end that you have gone through a thorough review of all the stuff in your life and categorized it appropriately. It works by presenting you with a series of prompts. In response to each prompt, you can type a task in to add it to taskwarrior. Simply enter what you would enter after the command `task add`. So to add the task "Get Milk +@errands priority:H" to your tasks, you would enter `Get Milk +@errands priority:H`. That exact string will be passed to Taskwarrior. You will see on the screen the command that is being run.
+
+Right now, the weekly review can only be customized by editing the `review.lisp` folder. Future versions will allow you to define your own reviews (removing unnecessary prompts or creating custom reviews like a shortened "daily" review). The full review is a full, GTD style weekly review. Expect it to take a full hour if you are a reasonably broadly committed person. Pausing a review and resuming where you left off is not currently supported.
 
 ### The Hook
 
@@ -64,25 +70,28 @@ As such, this program works best when used in conjunction with the optional on-e
 
 ### 0.1.0
 
-This release.
-
-### 0.1.1
-
-- Allow users to input tasks into taskwarrior while reviewing projects
-- Weekly review interface to prompt the user through a weekly review following a fixed script.
-
-### 0.1.2
-
-- Add custom weekly review templates.
+Allowed users to review their projects list.
 
 ### 0.2.0
 
-- Weekly Review feature should be complete.
+This release.
+
+### 0.2.1
+
+- Add custom weekly review templates.
+
+### 0.2.2
+
+- Capture and store metadata about projects.
+
+### 0.2.3
+
+- Project View which displays your tasks for a project as well as other metadata around the project (to include links to folders where the project reference data lives).
 
 ### 0.3
 
-- Improve storage backend for projects, capturing more metadata about each project.
+- Natural planning guide and project management view.
 
 ### 0.4
 
-- Use metadata to automatically add metadata to created tasks in taskwarrior (if a project has the @computer tag, then so do tasks created from it in gtd-review)
+- (We can already do this!) Use metadata to automatically add metadata to created tasks in taskwarrior (if a project has the @computer tag, then so do tasks created from it in gtd-review)
