@@ -4,15 +4,16 @@
   :description "GTD Review is a guided walk through your GTD Weekly Review that works with taskwarrior."
   :author "Jonathan A. Bennett <doulos05@gmail.com>"
   :license "MIT"
-  :version "0.1.0"
+  :version "0.2.0"
   :serial t
   :depends-on ("yason" "cl-ascii-table")
   :components
   ((:file "package")
    (:file "utils" :depends-on ("package"))
-   (:file "task" :depends-on ("package"))
-   (:file "project" :depends-on ("package"))
-   (:file "gtd-review" :depends-on ("package")))
+   (:file "task" :depends-on ("package" "utils"))
+   (:file "project" :depends-on ("package" "utils"))
+   (:file "review" :depends-on ("package" "utils"))
+   (:file "gtd-review" :depends-on ("package" "utils")))
   :build-operation :program-op
   :build-pathname "gtd-review"
   :entry-point "gtd-review:main")
