@@ -38,3 +38,28 @@
                 (finish-output)
                 (setq answer (read-line))
         finally (return answer)))
+
+(defun add-taskwarrior (user-string context)
+  "Add a task to taskwarrior. Captures context if it is reported by gtd-review."
+  (if (equal user-string "")
+      ()
+      (let ((cmd-string (format nil "task add ~A ~A" context user-string)))
+        (uiop:run-program cmd-string :ignore-error-status t :output :string))))
+
+(defun add-until-enter (context)
+  (loop with leave = nil
+        with user-input = nil
+        with task-string = nil
+        while (null leave)
+        do (format t "Add a task to taskwarrior using the following context: ~A~%" context)
+           (write-string "Enter the task here or hit enter to continue without adding a task: ")
+           (finish-output)
+           (setq user-input (read-line))
+        if (equal user-input "")
+          do (setq leave t)
+        else do (clear-input)
+                (setq task-string (format nil "task add ~A ~A~%" context user-input))
+                (write-string "This will execute the following command:")
+                (terpri)
+                (write-string task-string)
+                (uiop:run-program task-string :ignore-error-status t :output :string)))
