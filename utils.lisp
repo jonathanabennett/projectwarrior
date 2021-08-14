@@ -62,4 +62,7 @@
                 (write-string "This will execute the following command:")
                 (terpri)
                 (write-string task-string)
-                (uiop:run-program task-string :ignore-error-status t :output :string)))
+                (uiop:run-program task-string :ignore-error-status t :output :string))
+  (terpri)
+  (terpri)
+  (terpri))
