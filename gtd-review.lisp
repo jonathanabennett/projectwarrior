@@ -43,6 +43,7 @@
       (progn
         (format t "~%~%~%~%Project: ~A~%" project)
         (list-tasks project)
+        (add-until-enter (format nil "project:~A" project))
         (let ((response (ask-until-valid '("a" "b" "d") "Is your project [a]ctive, [c]ompleted, or [d]eleted? ")))
           (cond
             ((equal response "a") (push project active-projects))
