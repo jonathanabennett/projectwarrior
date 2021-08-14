@@ -72,4 +72,4 @@
        ((equal (car args) "add") (add (car (cdr args))))
        ((equal (car args) "projects") (projects-review))
        ((equal (car args) "review") (weekly-review))
-       (t (weekly-review)))))
+       (t (help)))))
