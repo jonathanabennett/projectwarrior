@@ -57,7 +57,7 @@
                  :uuid (uuid::make-v5-uuid uuid::+namespace-dns+ name)))
 
 ;; Make project with optionals
-(defun add-project (&key uuid description slug tags inherit-tags (db *projects-list*))
+(defun add-project (&key uuid description slug tags inherit-tags)
   (if (eq slug nil)
       (setf slug (cl-slug::slugify description)))
   (if (eq uuid nil)
