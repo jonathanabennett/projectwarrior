@@ -65,6 +65,10 @@
 (defun main (&rest argv)
   "This is the script entry point."
   (declare (ignore argv))
+  ;; Add code here to read in ~/.gtd-revew/config.lisp
+  ;; If the file doesn't exist, create a default one from the template.
+  ;; Primary initial contents will be the review options
+  ;; Which will get registered as keyword options after review.
   (let ((args (uiop/image:command-line-arguments)))
      (cond
        ((equal (car args) "help") (help))

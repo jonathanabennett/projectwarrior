@@ -63,3 +63,18 @@
                 (terpri)
                 (write-string task-string)
                 (uiop:run-program task-string :ignore-error-status t :output :string)))
+
+;; Date work
+(defun date-as-list (universal-timestamp)
+  "Take a universal timestamp, strip out the seconds, minutes, and hours, and return the day, month, and year as a list."
+  (multiple-value-bind (sec min hour day month year) (decode-universal-time universal-timestamp)
+    (declare (ignore sec min hour)) (list 0 0 0 day month year)))
+
+(defun list-to-date (date-list)
+  (apply #'encode-universal-time date-list))
+
+;; Relative dates are parsed as days, weeks, months, or years from today.
+;; Full words will be permitted eventually but initially, only 1 letter abbreviations
+(defun parse-relative-date (date-delta)
+  "Take a string that is in the form of +<d*><[d|w|m|y]> and parse it into a time delta from today."
+  )
