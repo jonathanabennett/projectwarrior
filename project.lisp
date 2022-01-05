@@ -69,11 +69,11 @@
                  :tags tags
                  :inherit-tags inherit-tags) *projects-list*))
 
-(defmethod slug-equals ((p project) str)
+(defmethod slug= ((p project) str)
   "Check whether or not project `p' has the slug `str'"
   (string= (slug p) str))
 
-(defmethod project-equals ((p project) (o project))
+(defmethod project= ((p project) (o project))
   "Two projects are equal if their UUIDs are equal."
   (uuid::uuid= (uuid p) (uuid o)))
 
