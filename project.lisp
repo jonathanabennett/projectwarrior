@@ -57,23 +57,31 @@
                  :uuid (uuid::make-v5-uuid uuid::+namespace-dns+ name)))
 
 ;; Make project with optionals
-(defun make-project (&key uuid description slug tags inherit-tags)
+(defun add-project (&key uuid description slug tags inherit-tags (db *projects-list*))
   (if (eq slug nil)
       (setf slug (cl-slug::slugify description)))
   (if (eq uuid nil)
       (setf uuid (uuid::make-v5-uuid uuid::+namespace-dns+ slug)))
-  (make-instance 'project
+  (push (make-instance 'project
                  :description description
                  :uuid uuid
                  :slug slug
                  :tags tags
-                 :inherit-tags inherit-tags))
+                 :inherit-tags inherit-tags) *projects-list*))
 
-(defun add-project (p database)
-  (push p database))
+(defmethod slug-equals ((p project) str)
+  "Check whether or not project `p' has the slug `str'"
+  (string= (slug p) str))
 
-(defmethod display ((p project))
-  (format nil "~a: ~a" (description p) (slug p)))
+(defmethod project-equals ((p project) (o project))
+  "Two projects are equal if their UUIDs are equal."
+  (uuid::uuid= (uuid p) (uuid o)))
+
+(defmethod print-object ((p project) out)
+  "Display `p' on the screen in the format
+Description: slug"
+  (print-unreadable-object (p out :type t)
+    (format out "~a: ~a" (slug p) (description p))))
 ;; Save project to file as an alist
 (defmethod project-to-file (project p)
   "This function will write the project out to a file as a lisp form which, when evaluated, will create the project again.")
