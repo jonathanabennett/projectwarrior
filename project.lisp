@@ -4,6 +4,8 @@
 
 (in-package #:gtd-review)
 
+(defvar *active-projects-list* nil)
+
 (defclass project ()
   ((uuid
     :initarg :uuid
@@ -67,7 +69,8 @@
                  :uuid uuid
                  :slug slug
                  :tags tags
-                 :inherit-tags inherit-tags) *projects-list*))
+                 :inherit-tags inherit-tags) *active-projects-list*))
+
 
 (defmethod slug= ((p project) str)
   "Check whether or not project `p' has the slug `str'"
@@ -82,6 +85,20 @@
 Description: slug"
   (print-unreadable-object (p out :type t)
     (format out "~a: ~a" (slug p) (description p))))
-;; Save project to file as an alist
-(defmethod project-to-file (project p)
-  "This function will write the project out to a file as a lisp form which, when evaluated, will create the project again.")
+
+(defun save-projects (project-list filename)
+  "Save the `project-list' to file.
+Typically called with ~/.cl-gtd/projects.db as the `filename'"
+  (with-open-file (out filename
+                       :direction :output
+                       :if-exists :supersede)
+    (cl-json:with-array (out)
+      (dolist (p project-list)
+        (cl-json:as-array-member (out) (cl-json:with-object (out)
+          (cl-json:encode-object-member "uuid" (format nil "~a" (uuid p)) out)
+          (cl-json:encode-object-member "slug" (slug p) out)
+          (cl-json:encode-object-member "description" (description p) out)
+          (cl-json:encode-object-member "areaOfFocus" (area-of-focus p) out)
+          (cl-json:encode-object-member "tags" (tags p) out)
+          (cl-json:encode-object-member "inheritTags" (inherit-tags p) out)))
+        (format out "~%")))))
