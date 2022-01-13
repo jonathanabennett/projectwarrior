@@ -104,3 +104,19 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
           (cl-json:encode-object-member "tags" (tags p) out)
           (cl-json:encode-object-member "inheritTags" (inherit-tags p) out)))
         (format out "~%")))))
+
+(defun load-projects (filename)
+  (with-open-file (in filename
+                      :direction :input)
+    (let  ((data (cl-json:decode-json in)))
+      (dolist (p data)
+        (json->project p)))))
+
+(defun json->project (json-data)
+  (add-project :uuid (cdr (assoc :uuid json-data))
+               :description (cdr (assoc :description json-data))
+               :slug (cdr (assoc :slug json-data))
+               :area-of-focus (cdr (assoc :AREA-OF-FOCUS json-data))
+               :tags (cdr (assoc :TAGS json-data))
+               :inherit-tags (cdr (assoc :inherit-tags json-data))))
+
