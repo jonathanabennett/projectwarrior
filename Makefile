@@ -16,9 +16,9 @@ hook:
 	mkdir -p ~/.cl-gtd
 	touch ~/.cl-gtd/projects.txt
 	$(LISP) --eval "(require 'asdf)" \
-		--load gtd-review.asd \
-		--eval '(ql:quickload :gtd-review/tw-hook)' \
-		--eval '(asdf:make :gtd-review/tw-hook)' \
+		--load projectwarrior.asd \
+		--eval '(ql:quickload :projectwarrior/tw-hook)' \
+		--eval '(asdf:make :projectwarrior/tw-hook)' \
 		--eval '(quit)'
 	mv ./on-exit-projects-list ~/.task/hooks/on-exit-projects-list
 
@@ -26,12 +26,12 @@ build:
 	mkdir -p ~/.cl-gtd
 	touch ~/.cl-gtd/projects.txt
 	$(LISP) --eval "(require 'asdf)" \
-		--load gtd-review.asd \
-		--eval '(ql:quickload :gtd-review)' \
-		--eval '(asdf:make :gtd-review)' \
+		--load projectwarrior.asd \
+		--eval '(ql:quickload :projectwarrior)' \
+		--eval '(asdf:make :projectwarrior)' \
 		--eval '(quit)'
-		echo "Please move the gtd-review executable somewhere on your PATH"
+		echo "Please move the project executable somewhere on your PATH"
 
 install:
-	mv gtd-review ~/.bin/
+	mv project ~/.bin/
 # end

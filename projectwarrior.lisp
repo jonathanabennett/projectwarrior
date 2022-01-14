@@ -1,4 +1,4 @@
-;;;; gtd-review.lisp
+;;;; projectwarrior.lisp
 
 ;;; This program walked a user through a review of their projects.
 ;;; Projects are pulled from the task management program `taskwarrior`.
@@ -18,7 +18,7 @@
 ;;; When finished, say goodbye.
 
 
-(in-package #:gtd-review)
+(in-package #:projectwarrior)
 
 (defun list-tasks (project)
   "Retrieve a json list of tasks and parse them into Task objects."
@@ -55,7 +55,7 @@
 
 (defun help ()
   "Print out the help."
-  (format t "USAGE: ./gtd-review <subcommand> <project>")
+  (format t "USAGE: projectwarrior <subcommand> <project>")
   (format t "add <project>: Add <project> as a project.")
   (format t "Project should be in the same format as a taskwarrior project.")
   (format t "help: Display this message.")

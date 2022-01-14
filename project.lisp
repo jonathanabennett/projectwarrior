@@ -2,7 +2,7 @@
 
 ;;; This file defines a project as seen by the gtd-review program.
 
-(in-package #:gtd-review)
+(in-package #:projectwarrior)
 
 (defvar *active-projects-list* nil)
 

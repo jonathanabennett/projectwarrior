@@ -1,6 +1,6 @@
 ;;; Holds common functions used across the program
 
-(in-package #:gtd-review)
+(in-package #:projectwarrior)
 
 (defparameter *projects-filepath* (uiop:native-namestring "~/.cl-gtd/projects.txt"))
 
@@ -19,7 +19,7 @@
   (uiop:read-file-lines file))
 
 (defun sync-projects-list (file)
-  "Compare the list of projects stored in gtd-review to the list of projects from taskwarrior and keep the union of these two sets"
+  "Compare the list of projects stored in projectwarrior to the list of projects from taskwarrior and keep the union of these two sets"
   (let* ((current-projects (get-list-from-file file))
          (new-projects (get-new-projects-list))
          (updated-projects (merge-lists current-projects new-projects)))
@@ -40,7 +40,7 @@
         finally (return answer)))
 
 (defun add-taskwarrior (user-string context)
-  "Add a task to taskwarrior. Captures context if it is reported by gtd-review."
+  "Add a task to taskwarrior. Captures context if it is reported by projectwarrior."
   (if (equal user-string "")
       ()
       (let ((cmd-string (format nil "task add ~A ~A" context user-string)))

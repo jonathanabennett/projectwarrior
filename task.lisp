@@ -3,7 +3,7 @@
 ;;; This file holds the internal representation of a task imported from
 ;;; taskwarrior.
 
-(in-package :gtd-review)
+(in-package :projectwarrior)
 
 (defclass task ()
   ((id

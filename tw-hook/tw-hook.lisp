@@ -9,4 +9,4 @@
 
 (defun main ()
   "Entry point for the hook."
-  (GTD-REVIEW:sync-projects-list GTD-REVIEW:*projects-filepath*))
+  (PROJECTWARRIOR:sync-projects-list PROJECTWARRIOR:*projects-filepath*))

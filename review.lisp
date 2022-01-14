@@ -8,7 +8,7 @@
 ;;; *SHOULD I REPLACE THE FOLLOWING WITH A MACRO THAT GENERATES A `REVIEW' ITEM FOR EACH PROJECT?*
 ;;; `FUNCTION': This is a function to call to generate the response.
 
-(in-package #:gtd-review)
+(in-package #:projectwarrior)
 
 (defun clear-inboxes ()
   "This function reminds the user to clear their inboxes."

@@ -1,6 +1,6 @@
 ;;;; package.lisp
 
-(defpackage :gtd-review
+(defpackage :projectwarrior
   (:use #:cl)
   (:export #:main
            #:merge-lists

@@ -5,6 +5,7 @@
 ;;; guaranteed to be loaded and the user values will overwrite the defaults.
 ;;;
 
+(in-package #:projectwarrior)
 
 ;; General
 (defvar *data-folder* (uiop:native-namestring "~/.cl-gtd/") "Folder where data is stored.")
