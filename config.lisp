@@ -9,4 +9,10 @@
 
 ;; General
 (defvar *data-folder* (uiop:native-namestring "~/.cl-gtd/") "Folder where data is stored.")
+(defvar *active-projects-filepath* (uiop:native-namestring
+                             (concatenate 'string *data-folder* "active.json")))
+(defvar *completed-projects-filepath* (uiop:native-namestring
+                             (concatenate 'string *data-folder* "completed.json")))
+(defvar *deleted-projects-filepath* (uiop:native-namestring
+                             (concatenate 'string *data-folder* "deleted.json")))
 (defvar *task-bin* "" "Location of taskwarrior binary.")

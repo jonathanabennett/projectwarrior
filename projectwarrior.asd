@@ -9,11 +9,12 @@
   :depends-on ("yason" "cl-ascii-table" "uuid" "cl-slug" "cl-json")
   :components
   ((:file "package")
-   (:file "utils" :depends-on ("package"))
-   (:file "task" :depends-on ("package" "utils"))
-   (:file "project" :depends-on ("package" "utils"))
-   (:file "review" :depends-on ("package" "utils"))
-   (:file "projectwarrior" :depends-on ("package" "utils")))
+   (:file "config" :depends-on ("package"))
+   (:file "utils" :depends-on ("package" "config"))
+   (:file "task" :depends-on ("package" "config" "utils"))
+   (:file "project" :depends-on ("package" "config" "utils"))
+   (:file "review" :depends-on ("package" "config" "utils"))
+   (:file "projectwarrior" :depends-on ("package" "config" "utils")))
   :build-operation :program-op
   :build-pathname "projectwarrior"
   :entry-point "projectwarrior:main")
