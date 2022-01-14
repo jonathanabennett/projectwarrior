@@ -28,10 +28,34 @@
        (ascii-table:add-row table (list (gethash "description" task) (gethash "status" task) (gethash "urgency" task))))
     (ascii-table:display table)))
 
-(defun add (project)
-  "This adds a new project to the file identified in *projects-filepath*."
-  (with-open-file (f *projects-filepath* :direction :output :if-exists :append)
-    (format f "~&~A~%" project)))
+(defun add (project-data)
+  "This adds a new project to the active.json project list after parsing the string into appropriate variables."
+  ;; Step 1 parse project-string into appropriate variables
+  (let ((user-description '())
+        (user-slug "")
+        (user-aof "")
+        (user-tags '())
+        (user-inherit-tags '()))
+    ;; If the args include a string in the format "area:<area-of-focus>", make it the value of `user-aof'.
+    ;; If the args include a string in the format "slug:<custom-slug>, make it the value of `user-slug'.
+    ;; Collect all the args that begin with a single "+" and add them to the `user-tags' list
+    ;; Collect all the args that begin with "++" and add them to `user-inherit-tags' list.
+    ;; Any args not collected by the above filters are collected into the `user-description' variable.
+    (dolist (str project-data)
+      (cond
+        ((search "area:" str) (setq user-aof (subseq str 5)))
+        ((search "++" str) (push str user-inherit-tags))
+        ((search "+" str) (push str user-tags))
+        ((search "slug:" str) (setq user-aof (subseq str 5)))
+        (t (push str user-description))))
+      ;; Step 2 `add-project'
+    (add-project :description (format nil "~{~a~^ ~}" user-description)
+                 :slug user-slug
+                 :tags user-tags
+                 :inherit-tags user-inherit-tags
+                 :area-of-focus user-aof)
+  ;; Step 3 `save-projects'
+    (save-projects *active-projects-list* *projects-filepath*)))
 
 (defun projects-review ()
   "This guides a user through a review of the projects listed in their *projects-filepath* file."
