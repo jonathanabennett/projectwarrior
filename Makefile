@@ -33,5 +33,5 @@ build:
 		echo "Please move the project executable somewhere on your PATH"
 
 install:
-	mv project ~/.bin/
+	mv projectwarrior ~/.bin/project
 # end
