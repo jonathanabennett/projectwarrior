@@ -105,6 +105,7 @@
 (defun main (&rest argv)
   "This is the script entry point."
   (declare (ignore argv))
+  (load-projects *active-projects-filepath*)
   ;; Add code here to read in ~/.gtd-revew/config.lisp
   ;; If the file doesn't exist, create a default one from the template.
   ;; Primary initial contents will be the review options
@@ -112,7 +113,7 @@
   (let ((args (uiop/image:command-line-arguments)))
      (cond
        ((equal (car args) "help") (help))
-       ((equal (car args) "add") (add (car (cdr args))))
+       ((equal (car args) "add") (add (cdr args)))
        ((equal (car args) "projects") (projects-review))
        ((equal (car args) "review") (weekly-review))
        (t (view-projects)))))

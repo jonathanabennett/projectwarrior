@@ -121,3 +121,17 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
                :tags (cdr (assoc :TAGS json-data))
                :inherit-tags (cdr (assoc :inherit-tags json-data))))
 
+(defun search-aof (search-term project-list)
+  (remove-if-not (lambda (project) (search search-term (area-of-focus project))) project-list))
+
+(defun where (&key aof tags inherit-tags slug description)
+  #'(lambda (project)
+      (and
+       (if aof          (search aof (area-of-focus project)) t)
+       (if tags         (member tags (tags project))         t)
+       (if inherit-tags (member inherit-tags (inherit-tags project)) t)
+       (if slug         (search slug (slug project)) t)
+       (if description  (search description (description project)) t))))
+
+(defun search-projects (search-fn project-list)
+  (remove-if-not search-fn project-list))
