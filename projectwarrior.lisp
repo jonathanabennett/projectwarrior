@@ -49,28 +49,23 @@
     ;; Collect all the args that begin with "++" and add them to `user-inherit-tags' list.
     ;; Any args not collected by the above filters are collected into the `user-description' variable.
     (dolist (str project-data)
-      (let ((input-list (uiop:split-string str)))
-        (dolist (token input-list)
-          (cond
-            ((search "area:" token) (setq user-aof (subseq token 5)))
-            ((search "++" token) (push (subseq token 2) user-inherit-tags))
-            ((search "+" token) (push (subseq token 1) user-tags))
-            ((search "slug:" token) (setq user-aof (subseq token 5)))
-            (t (setq user-description (append user-description (list token))))))
-        ;; Step 2 `add-project'
-        (add-project :description (format nil "~{~a~^ ~}" user-description)
-                     :slug user-slug
-                     :tags user-tags
-                     :inherit-tags user-inherit-tags
-                     :area-of-focus user-aof))
-      ;; Step 3 `save-projects'
-      (save-projects *active-projects-list* *active-projects-filepath*))))
+      (cond
+        ((search "area:" str) (setq user-aof (subseq str 5)))
+        ((search "++" str) (push (subseq str 2) user-inherit-tags))
+        ((search "+" str) (push (subseq str 1) user-tags))
+        ((search "slug:" str) (setq user-slug (subseq str 5)))
+        (t (setq user-description (append user-description (list str))))))
+    (add-project :description (format nil "~{~a~^ ~}" user-description)
+                 :slug user-slug :tags user-tags
+                 :inherit-tags user-inherit-tags
+                 :area-of-focus user-aof)
+    (save-projects *active-projects-list* *active-projects-filepath*)))
 
 (defun view-projects (&optional (source :active))
   "Display the list of projects."
+  (setq *active-projects-list* nil)
   (cond
-    ((eq source :active) (list-projects *active-projects-list*))))
-
+    ((eq source :active) (load-projects *active-projects-filepath*) (list-projects *active-projects-list*))))
 
 (defun complete-project (project-num)
   "Complete a project.")
