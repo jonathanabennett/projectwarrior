@@ -42,20 +42,32 @@
     ;; Collect all the args that begin with "++" and add them to `user-inherit-tags' list.
     ;; Any args not collected by the above filters are collected into the `user-description' variable.
     (dolist (str project-data)
-      (cond
-        ((search "area:" str) (setq user-aof (subseq str 5)))
-        ((search "++" str) (push str user-inherit-tags))
-        ((search "+" str) (push str user-tags))
-        ((search "slug:" str) (setq user-aof (subseq str 5)))
-        (t (push str user-description))))
-      ;; Step 2 `add-project'
-    (add-project :description (format nil "~{~a~^ ~}" user-description)
-                 :slug user-slug
-                 :tags user-tags
-                 :inherit-tags user-inherit-tags
-                 :area-of-focus user-aof)
-  ;; Step 3 `save-projects'
-    (save-projects *active-projects-list* *projects-filepath*)))
+      (let ((input-list (uiop:split-string str)))
+        (dolist (token input-list)
+          (cond
+            ((search "area:" token) (setq user-aof (subseq token 5)))
+            ((search "++" token) (push (subseq token 2) user-inherit-tags))
+            ((search "+" token) (push (subseq token 1) user-tags))
+            ((search "slug:" token) (setq user-aof (subseq token 5)))
+            (t (push token user-description))))
+        ;; Step 2 `add-project'
+        (add-project :description (format nil "~{~a~^ ~}" user-description)
+                     :slug user-slug
+                     :tags user-tags
+                     :inherit-tags user-inherit-tags
+                     :area-of-focus user-aof))
+      ;; Step 3 `save-projects'
+      (save-projects *active-projects-list* *active-projects-filepath*))))
+
+(defun view-projects ()
+  "Display the list of projects.")
+
+
+(defun complete-project (project-num)
+  "Complete a project.")
+
+(defun delete-project (project-num)
+  "Delete a project.")
 
 (defun projects-review ()
   "This guides a user through a review of the projects listed in their *projects-filepath* file."
