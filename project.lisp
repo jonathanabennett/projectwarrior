@@ -65,13 +65,14 @@
   (if (eq uuid nil)
       (setf uuid (uuid:make-v5-uuid uuid::+namespace-dns+ slug))
       (setf uuid (uuid:make-uuid-from-string uuid)))
-  (push (make-instance 'project
-                 :description description
-                 :uuid uuid
-                 :slug slug
-                 :area-of-focus area-of-focus
-                 :tags tags
-                 :inherit-tags inherit-tags) *active-projects-list*))
+  (setq *active-projects-list*
+        (append *active-projects-list*
+                (list (make-instance 'project
+                                     :description description
+                                     :uuid uuid
+                                     :slug slug
+                                     :area-of-focus area-of-focus
+                                     :tags tags :inherit-tags inherit-tags)))))
 
 
 (defmethod slug= ((p project) str)
