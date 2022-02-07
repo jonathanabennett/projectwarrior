@@ -20,6 +20,13 @@
 
 (in-package #:projectwarrior)
 
+(defun list-projects (project-list)
+  (let ((table (ascii-table:make-table `("#" "Description" "Area of Focus" "Tags") :header "Projects Report")))
+    (loop for project in project-list
+          for i from 1
+          do (ascii-table:add-row table (list i (description project) (area-of-focus project) (tags project))))
+    (ascii-table:display table)))
+
 (defun list-tasks (project)
   "Retrieve a json list of tasks and parse them into Task objects."
   (let ((tasks (yason:parse (uiop:run-program (format nil "task project.is:~A and '(status:PENDING or status:WAITING)' export rc.hooks=off" project) :ignore-error-status t :output :string)))
@@ -49,7 +56,7 @@
             ((search "++" token) (push (subseq token 2) user-inherit-tags))
             ((search "+" token) (push (subseq token 1) user-tags))
             ((search "slug:" token) (setq user-aof (subseq token 5)))
-            (t (push token user-description))))
+            (t (setq user-description (append user-description (list token))))))
         ;; Step 2 `add-project'
         (add-project :description (format nil "~{~a~^ ~}" user-description)
                      :slug user-slug
@@ -59,8 +66,10 @@
       ;; Step 3 `save-projects'
       (save-projects *active-projects-list* *active-projects-filepath*))))
 
-(defun view-projects ()
-  "Display the list of projects.")
+(defun view-projects (&optional (source :active))
+  "Display the list of projects."
+  (cond
+    ((eq source :active) (list-projects *active-projects-list*))))
 
 
 (defun complete-project (project-num)
@@ -112,3 +121,4 @@
        ((equal (car args) "projects") (projects-review))
        ((equal (car args) "review") (weekly-review))
        (t (help)))))
+
