@@ -84,7 +84,7 @@
 
 (defmethod print-object ((p project) out)
   "Display `p' on the screen in the format
-Description: slug"
+slug: description"
   (print-unreadable-object (p out :type t)
     (format out "~a: ~a" (slug p) (description p))))
 
