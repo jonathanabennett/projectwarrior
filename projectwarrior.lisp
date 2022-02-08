@@ -20,7 +20,10 @@
 
 (in-package #:projectwarrior)
 
+;; TODO Replace ascii-table with custom `format' calls so that I can control
+;; the layout better. The current layout is far too bulky.
 (defun list-projects (project-list)
+  "This function builds an ascii-table table of the projects."
   (let ((table (ascii-table:make-table `("#" "Description" "Area of Focus" "Tags") :header "Projects Report")))
     (loop for project in project-list
           for i from 1
@@ -37,7 +40,6 @@
 
 (defun add (project-data)
   "This adds a new project to the active.json project list after parsing the string into appropriate variables."
-  ;; Step 1 parse project-string into appropriate variables
   (let ((user-description '())
         (user-slug "")
         (user-aof "")
