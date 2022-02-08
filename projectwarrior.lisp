@@ -63,17 +63,28 @@
     (save-projects *active-projects-list* *active-projects-filepath*)))
 
 (defun view-projects (&optional (source :active))
-  "Display the list of projects."
-  (setq *active-projects-list* nil)
+  "This will filter projects based on a call to `where' before passing that
+filtered list on to `list-projects' for display."
   (cond
-    ((eq source :active) (load-projects *active-projects-filepath*) (list-projects *active-projects-list*))))
+    ((eq source :completed) (list-projects *completed-projects-list*))
+    ((eq source :deleted)   (list-projects *deleted-projects-list*))
+    (t                      (list-projects *active-projects-list*)))
 
 (defun complete-project (project-num)
-  "Complete a project.")
+  "Find project `project-num' in the `*active-projects-list*', remove it, and append it to the
+`*completed-projects-list*'. Then save both project lists to file."
+  (let ((project (nth (- project-num 1) *active-projects-list*)))
+    (setq *active-projects-list* (remove project *active-projects-list*))
+    (setq *completed-projects-list* (append *completed-projects-list* (list project))))
+  (save-projects *active-projects-list* *active-projects-filepath*)
+  (save-projects *completed-projects-list* *completed-projects-filepath*))
 
 (defun delete-project (project-num)
-  "Delete a project.")
+  "Find project `project-num' in the `*active-projects-list*', remove it, and append it to the
+`*deleted-projects-list*'. Then save both project lists to file.")
 
+;; TODO Rewrite this to use the new `PROJECT' class
+;; Look up tasks using the `slug' field on the `PROJECT' object.
 (defun projects-review ()
   "This guides a user through a review of the projects listed in their *projects-filepath* file."
   (format t "Welcome to your project review. Hold on while sync your projects.")
@@ -106,8 +117,10 @@
 (defun main (&rest argv)
   "This is the script entry point."
   (declare (ignore argv))
-  (load-projects *active-projects-filepath*)
-  ;; Add code here to read in ~/.gtd-revew/config.lisp
+  (load-projects *active-projects-list* *active-projects-filepath*)
+  (load-projects *completed-projects-list* *completed-projects-filepath*)
+  (load-projects *deleted-projects-list* *deleted-projects-filepath*)
+  ;; Add code here to read in ~/.projectwarrior/config.lisp
   ;; If the file doesn't exist, create a default one from the template.
   ;; Primary initial contents will be the review options
   ;; Which will get registered as keyword options after review.

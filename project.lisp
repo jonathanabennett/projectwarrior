@@ -4,8 +4,6 @@
 
 (in-package #:projectwarrior)
 
-(defvar *active-projects-list* nil)
-
 (defclass project ()
   ((uuid
     :initarg :uuid

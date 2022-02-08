@@ -9,3 +9,7 @@
            #:sync-projects-list
            #:*projects-filepath*
            #:get-list-from-file))
+
+(defvar *active-projects-list* nil)
+(defvar *completed-projects-list* nil)
+(defvar *deleted-projects-list* nil)
