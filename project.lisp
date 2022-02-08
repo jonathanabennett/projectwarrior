@@ -59,14 +59,14 @@
                  :uuid (uuid::make-v5-uuid uuid::+namespace-dns+ name)))
 
 ;; Make project with optionals
-(defun add-project (&key uuid description slug tags inherit-tags area-of-focus)
+(defun add-project (&key uuid description slug tags inherit-tags area-of-focus (target-list *active-projects-list*))
   (if (eq slug nil)
       (setf slug (cl-slug::slugify description)))
   (if (eq uuid nil)
       (setf uuid (uuid:make-v5-uuid uuid::+namespace-dns+ slug))
       (setf uuid (uuid:make-uuid-from-string uuid)))
-  (setq *active-projects-list*
-        (append *active-projects-list*
+  (setq target-list
+        (append target-list
                 (list (make-instance 'project
                                      :description description
                                      :uuid uuid
@@ -106,20 +106,21 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
           (cl-json:encode-object-member "inheritTags" (inherit-tags p) out)))
         (format out "~%")))))
 
-(defun load-projects (filename)
+(defun load-projects (filename &optional (target-list *active-projects-list*))
   (with-open-file (in filename
                       :direction :input)
     (let  ((data (cl-json:decode-json in)))
       (dolist (p data)
-        (json->project p)))))
+        (json->project p target-list)))))
 
-(defun json->project (json-data)
+(defun json->project (json-data target-list)
   (add-project :uuid (cdr (assoc :uuid json-data))
                :description (cdr (assoc :description json-data))
                :slug (cdr (assoc :slug json-data))
                :area-of-focus (cdr (assoc :AREA-OF-FOCUS json-data))
                :tags (cdr (assoc :TAGS json-data))
-               :inherit-tags (cdr (assoc :inherit-tags json-data))))
+               :inherit-tags (cdr (assoc :inherit-tags json-data))
+               :target-list target-list))
 
 (defun search-aof (search-term project-list)
   (remove-if-not (lambda (project) (search search-term (area-of-focus project))) project-list))

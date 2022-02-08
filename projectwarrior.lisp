@@ -58,7 +58,8 @@
     (add-project :description (format nil "~{~a~^ ~}" user-description)
                  :slug user-slug :tags user-tags
                  :inherit-tags user-inherit-tags
-                 :area-of-focus user-aof)
+                 :area-of-focus user-aof
+                 :target-list *active-projects-list*)
     (save-projects *active-projects-list* *active-projects-filepath*)))
 
 (defun view-projects (&optional (source :active))
