@@ -64,6 +64,7 @@
   (write-line "What Unit plans do you need to write?")
   (write-line "What Lesson plans do you need to write?")
   (write-line "What tests or quizzes do you need to write?"))
+
 (defun professional-meetings ()
   (write-line "What meetings or information sharing do you need to review?")
   (write-line "What meetings need to be set or requested?")

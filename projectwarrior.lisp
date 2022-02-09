@@ -70,7 +70,7 @@ filtered list on to `list-projects' for display."
   (cond
     ((eq source :completed) (list-projects *completed-projects-list*))
     ((eq source :deleted)   (list-projects *deleted-projects-list*))
-    (t                      (list-projects *active-projects-list*)))
+    (t                      (list-projects *active-projects-list*))))
 
 (defun complete-project (project-num)
   "Find project `project-num' in the `*active-projects-list*', remove it, and append it to the
@@ -83,7 +83,12 @@ filtered list on to `list-projects' for display."
 
 (defun delete-project (project-num)
   "Find project `project-num' in the `*active-projects-list*', remove it, and append it to the
-`*deleted-projects-list*'. Then save both project lists to file.")
+`*deleted-projects-list*'. Then save both project lists to file."
+  (let ((project (nth (- project-num 1) *active-projects-list*)))
+    (setq *active-projects-list* (remove project *active-projects-list*))
+    (setq *deleted-projects-list (append *completed-projects-list* (list project))))
+  (save-projects *active-projects-list* *active-projects-filepath*)
+  (save-projeects *deleted-projects-list* *deleted-projects-filepath*))
 
 ;; TODO Rewrite this to use the new `PROJECT' class
 ;; Look up tasks using the `slug' field on the `PROJECT' object.
@@ -102,8 +107,7 @@ filtered list on to `list-projects' for display."
             ((equal response "a") (push project active-projects))
             ((equal response "c") ())
             ((equal response "d") ())
-            (t (push project active-projects))))
-        ))
+            (t (push project active-projects))))))
     (with-open-file (f *projects-filepath* :direction :output :if-exists :supersede)
       (format f "~{~A~%~}" active-projects))))
 
@@ -119,9 +123,9 @@ filtered list on to `list-projects' for display."
 (defun main (&rest argv)
   "This is the script entry point."
   (declare (ignore argv))
-  (load-projects *active-projects-list* *active-projects-filepath*)
-  (load-projects *completed-projects-list* *completed-projects-filepath*)
-  (load-projects *deleted-projects-list* *deleted-projects-filepath*)
+  (load-projects *active-projects-filepath* *active-projects-list*)
+  (load-projects *completed-projects-filepath* *completed-projects-list*)
+  (load-projects *deleted-projects-filepath* *deleted-projects-list*)
   ;; Add code here to read in ~/.projectwarrior/config.lisp
   ;; If the file doesn't exist, create a default one from the template.
   ;; Primary initial contents will be the review options
@@ -130,6 +134,6 @@ filtered list on to `list-projects' for display."
      (cond
        ((equal (car args) "help") (help))
        ((equal (car args) "add") (add (cdr args)))
-       ((equal (car args) "projects") (projects-review))
-       ((equal (car args) "review") (weekly-review))
+       ((equal (car args) "review") (projects-review))
+       ((equal (car args) "weekly") (weekly-review))
        (t (view-projects)))))

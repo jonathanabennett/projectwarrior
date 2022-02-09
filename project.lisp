@@ -106,8 +106,13 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
 
 (defun load-projects (filename &optional (target-list *active-projects-list*))
   (with-open-file (in filename
+                      :if-does-not-exist :create
                       :direction :input)
-    (let  ((data (cl-json:decode-json in)))
+
+    (let  ((data
+             (handler-case (cl-json:decode-json in)
+               (end-of-file (c)
+                 (cl-json:decode-json-from-string "[]")))))
       (dolist (p data)
         (json->project p target-list)))))
 
