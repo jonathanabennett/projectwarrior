@@ -79,3 +79,11 @@ Taskwarrior passes in all kinds of additional information, we ignore it as we do
                  :tags (gethash "tags" t-hash)
                  :uuid (gethash "uuid" t-hash)
                  :urgency (gethash "urgency" t-hash)))
+
+(defun list-tasks (project)
+  "Retrieve a json list of tasks and parse them into Task objects."
+  (let ((tasks (yason:parse (uiop:run-program (format nil "task project.is:~A and '(status:PENDING or status:WAITING)' export rc.hooks=off" project) :ignore-error-status t :output :string)))
+        (table (ascii-table:make-table `("Description" "Status" "Urgency") :header project)))
+    (dolist (task tasks)
+       (ascii-table:add-row table (list (gethash "description" task) (gethash "status" task) (gethash "urgency" task))))
+    (ascii-table:display table)))

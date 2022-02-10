@@ -20,24 +20,6 @@
 
 (in-package #:projectwarrior)
 
-;; TODO Replace ascii-table with custom `format' calls so that I can control
-;; the layout better. The current layout is far too bulky.
-(defun list-projects (project-list)
-  "This function builds an ascii-table table of the projects."
-  (let ((table (ascii-table:make-table `("#" "Description" "Area of Focus" "Tags") :header "Projects Report")))
-    (loop for project in project-list
-          for i from 1
-          do (ascii-table:add-row table (list i (description project) (area-of-focus project) (tags project))))
-    (ascii-table:display table)))
-
-(defun list-tasks (project)
-  "Retrieve a json list of tasks and parse them into Task objects."
-  (let ((tasks (yason:parse (uiop:run-program (format nil "task project.is:~A and '(status:PENDING or status:WAITING)' export rc.hooks=off" project) :ignore-error-status t :output :string)))
-        (table (ascii-table:make-table `("Description" "Status" "Urgency") :header project)))
-    (dolist (task tasks)
-       (ascii-table:add-row table (list (gethash "description" task) (gethash "status" task) (gethash "urgency" task))))
-    (ascii-table:display table)))
-
 (defun add (project-data)
   "This adds a new project to the active.json project list after parsing the string into appropriate variables."
   (let ((user-description '())
