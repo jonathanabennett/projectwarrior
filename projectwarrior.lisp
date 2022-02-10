@@ -123,9 +123,9 @@ filtered list on to `list-projects' for display."
 (defun main (&rest argv)
   "This is the script entry point."
   (declare (ignore argv))
-  (load-projects *active-projects-filepath* *active-projects-list*)
-  (load-projects *completed-projects-filepath* *completed-projects-list*)
-  (load-projects *deleted-projects-filepath* *deleted-projects-list*)
+  (load-projects *active-projects-filepath* :active)
+  (load-projects *completed-projects-filepath* :completed)
+  (load-projects *deleted-projects-filepath* :deleted)
   ;; Add code here to read in ~/.projectwarrior/config.lisp
   ;; If the file doesn't exist, create a default one from the template.
   ;; Primary initial contents will be the review options
@@ -134,6 +134,8 @@ filtered list on to `list-projects' for display."
      (cond
        ((equal (car args) "help") (help))
        ((equal (car args) "add") (add (cdr args)))
+       ((equal (car args) "done") (complete-project (cdr args)))
+       ((equal (car args) "delete") (delete-project (cdr args)))
        ((equal (car args) "review") (projects-review))
        ((equal (car args) "weekly") (weekly-review))
        (t (view-projects)))))
