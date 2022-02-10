@@ -110,9 +110,9 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
                       :direction :input)
 
     (let  ((data
-             (handler-case (cl-json:decode-json in)
-               (end-of-file (c)
-                 (cl-json:decode-json-from-string "[]")))))
+             (if (listen in)
+                 (cl-json:decode-json in)
+                 (cl-json:decode-json-from-string "[]"))))
       (dolist (p data)
         (json->project p target-list)))))
 
