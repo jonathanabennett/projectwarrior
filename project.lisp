@@ -57,20 +57,27 @@
                  :uuid (uuid::make-v5-uuid uuid::+namespace-dns+ name)))
 
 ;; Make project with optionals
-(defun add-project (&key uuid description slug tags inherit-tags area-of-focus (target-list *active-projects-list*))
+(defun add-project (&key uuid description slug tags inherit-tags area-of-focus (target-list :active))
   (if (eq slug nil)
       (setf slug (cl-slug::slugify description)))
   (if (eq uuid nil)
       (setf uuid (uuid:make-v5-uuid uuid::+namespace-dns+ slug))
       (setf uuid (uuid:make-uuid-from-string uuid)))
-  (setq target-list
-        (append target-list
-                (list (make-instance 'project
-                                     :description description
-                                     :uuid uuid
-                                     :slug slug
-                                     :area-of-focus area-of-focus
-                                     :tags tags :inherit-tags inherit-tags)))))
+  (let ((p (make-instance 'project
+                       :description description
+                       :uuid uuid :slug slug
+                       :area-of-focus area-of-focus
+                       :tags tags :inherit-tags inherit-tags)))
+    (cond
+      ((eq target-list :active) (setq *active-projects-list*
+                                      (append *active-projects-list*
+                                              (list p))))
+      ((eq target-list :completed) (setq *completed-projects-list*
+                                      (append *completed-projects-list*
+                                              (list p))))
+      ((eq target-list :deleted) (setq *deleted-projects-list*
+                                      (append *deleted-projects-list*
+                                              (list p)))))))
 
 
 (defmethod slug= ((p project) str)
@@ -104,7 +111,7 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
           (cl-json:encode-object-member "inheritTags" (inherit-tags p) out)))
         (format out "~%")))))
 
-(defun load-projects (filename &optional (target-list *active-projects-list*))
+(defun load-projects (filename &optional (target :active))
   (with-open-file (in filename
                       :if-does-not-exist :create
                       :direction :input)
@@ -114,7 +121,7 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
                  (cl-json:decode-json in)
                  (cl-json:decode-json-from-string "[]"))))
       (dolist (p data)
-        (json->project p target-list)))))
+        (json->project p target)))))
 
 (defun json->project (json-data target-list)
   (add-project :uuid (cdr (assoc :uuid json-data))
