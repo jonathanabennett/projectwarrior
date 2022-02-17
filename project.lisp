@@ -151,6 +151,14 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
 (defun search-projects (search-fn project-list)
   (remove-if-not search-fn project-list))
 
+(defun update-project (project &key new-id new-description new-slug new-area new-tags new-inherit-tags)
+  (if new-id (setf (id project) new-id))
+  (if new-description (setf (description project) new-description))
+  (if new-slug (setf (slug project) new-slug))
+  (if new-area (setf (area-of-focus project) new-area))
+  (if new-tags (setf (tags project) new-tags))
+  (if new-inherit-tags (setf (inherit-tags project) new-inherit-tags))
+  )
 ;; TODO Replace ascii-table with custom `format' calls so that I can control
 ;; the layout better. The current layout is far too bulky.
 (defun list-projects (project-list)
