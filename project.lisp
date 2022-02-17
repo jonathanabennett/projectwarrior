@@ -48,37 +48,29 @@
     :initform '()
     :accessor inherit-tags
     :documentation "A list of strings representing the tags which all tasks created from within gtd-review for this project should have by default."))
-  (:documentation "A class representing a project within gtd-review."))
+  (:documentation "A class representing a project within projectwarrior."))
 
 (defun project-from-taskwarrior (name)
+  "When coming from taskwarrior, projects only have a desctiption and a slug, which are identical."
   (make-instance 'project
                  :description name
                  :slug name
                  :uuid (uuid::make-v5-uuid uuid::+namespace-dns+ name)))
 
-;; Make project with optionals
-(defun add-project (&key uuid description slug tags inherit-tags area-of-focus (target-list :active))
+(defun make-project (&key uuid description slug tags inherit-tags area-of-focus id)
+  "Used to create projects for my filtered lists. This does not add it to one of the master lists."
   (if (eq slug nil)
       (setf slug (cl-slug::slugify description)))
   (if (eq uuid nil)
       (setf uuid (uuid:make-v5-uuid uuid::+namespace-dns+ slug))
       (setf uuid (uuid:make-uuid-from-string uuid)))
+  (if (eq id nil)
+      (setf id -1))
   (let ((p (make-instance 'project
                        :description description
-                       :uuid uuid :slug slug
+                       :uuid uuid :slug slug :id id
                        :area-of-focus area-of-focus
-                       :tags tags :inherit-tags inherit-tags)))
-    (cond
-      ((eq target-list :active) (setq *active-projects-list*
-                                      (append *active-projects-list*
-                                              (list p))))
-      ((eq target-list :completed) (setq *completed-projects-list*
-                                      (append *completed-projects-list*
-                                              (list p))))
-      ((eq target-list :deleted) (setq *deleted-projects-list*
-                                      (append *deleted-projects-list*
-                                              (list p)))))))
-
+                       :tags tags :inherit-tags inherit-tags)))))
 
 (defmethod slug= ((p project) str)
   "Check whether or not project `p' has the slug `str'"

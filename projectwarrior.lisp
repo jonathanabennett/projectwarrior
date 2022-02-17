@@ -38,12 +38,12 @@
         ((search "++" str) (push (subseq str 2) user-inherit-tags))
         ((search "+" str) (push (subseq str 1) user-tags))
         ((search "slug:" str) (setq user-slug (subseq str 5)))
-        (t (setq user-description (append user-description (list str))))))
-    (add-project :description (format nil "~{~a~^ ~}" user-description)
-                 :slug user-slug :tags user-tags
-                 :inherit-tags user-inherit-tags
-                 :area-of-focus user-aof
-                 :target-list *active-projects-list*)
+        (t (setq user-description (add-to-end user-description str)))))
+    (add-to-end *active-projects-list* (make-project :description (format nil "~{~a~^ ~}" user-description)
+                                                     :slug user-slug :tags user-tags
+                                                     :inherit-tags user-inherit-tags
+                                                     :area-of-focus user-aof
+                                                     :target-list *active-projects-list*))
     (save-projects *active-projects-list* *active-projects-filepath*)))
 
 (defun view-projects (&optional (source :active))
@@ -59,7 +59,7 @@ filtered list on to `list-projects' for display."
 `*completed-projects-list*'. Then save both project lists to file."
   (let ((project (nth (- project-num 1) *active-projects-list*)))
     (setq *active-projects-list* (remove project *active-projects-list*))
-    (setq *completed-projects-list* (append *completed-projects-list* (list project))))
+    (setq *completed-projects-list* (add-to-end *completed-projects-list* project)))
   (save-projects *active-projects-list* *active-projects-filepath*)
   (save-projects *completed-projects-list* *completed-projects-filepath*))
 
@@ -68,7 +68,7 @@ filtered list on to `list-projects' for display."
 `*deleted-projects-list*'. Then save both project lists to file."
   (let ((project (nth (- project-num 1) *active-projects-list*)))
     (setq *active-projects-list* (remove project *active-projects-list*))
-    (setq *deleted-projects-list (append *completed-projects-list* (list project))))
+    (setq *deleted-projects-list (add-to-end *completed-projects-list* project)))
   (save-projects *active-projects-list* *active-projects-filepath*)
   (save-projeects *deleted-projects-list* *deleted-projects-filepath*))
 
