@@ -83,8 +83,9 @@ Defaults to `-1' as a flag for the saving function to update the number.")
   (string= (slug p) str))
 
 (defmethod project= ((p project) (o project))
-  "Two projects are equal if their UUIDs are equal."
-  (uuid::uuid= (uuid p) (uuid o)))
+  "Two projects are equal if their `uuid' or `slug' are equal."
+  (or (slug= p (slug o))
+      (uuid::uuid= (uuid p) (uuid o))))
 
 (defmethod print-object ((p project) out)
   "Display `p' on the screen in the format
