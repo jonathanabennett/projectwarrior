@@ -65,6 +65,12 @@
                 (write-string task-string)
                 (uiop:run-program task-string :ignore-error-status t :output :string)))
 
+(defun add-to-end (target item)
+  "A helper function to make the append clearer and easier to read
+Because append needs lists, I have to wrap `item' in a list. This does that automatically
+and lets me use something closer to English in my code."
+  (append target (list item)))
+
 ;; Date work
 (defun date-as-list (universal-timestamp)
   "Take a universal timestamp, strip out the seconds, minutes, and hours, and return the day, month, and year as a list."
