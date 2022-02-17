@@ -159,18 +159,32 @@ the project(s) being modified."
         ((search "status:" term) (setq source (subseq term 7)))
         (t (setq description (add-to-end description term)))))
     (cond
-      ((string= source "active") (search-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description description) (load-projects *active-projects-filepath*)))
-      ((string= source "done") (search-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description description) (load-projects *completed-projects-filepath*)))
-      ((string= source "deleted") (search-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description description) (load-projects *deleted-projects-filepath*))))))
+      ((string= source "active") (search-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description description) *active-projects-list*))
+      ((string= source "done") (search-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description description) *completed-projects-list*))
+      ((string= source "deleted") (search-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description description) *deleted-projects-list*)))))
 
 
 (defun complete-projects (projects)
   "Complete all projects in `projects'. If `projects' is more than 3 itmes, prompt for each
-completion.")
+completion."
+  (let ((prompt (>= (length projects) 3))
+        (completep t))
+    (dolist (p projects)
+      (if prompt
+          (setf completep (yes-or-no-p "Do you want to complete project %a? " (description p))))
+      (if completep
+          (complete-project (id p))))))
 
 (defun modify-projects (projects modifications)
   "Modify all projects in the `projects' list with the changes `modification'.
 If `projects' contains more than 3 items, prompt for each.")
 
 (defun delete-projects (projects)
-  "Delete all projects in `projects'. If `projects' is more than 3 itesm, prompt for each.")
+  "Delete all projects in `projects'. If `projects' is more than 3 itesm, prompt for each."
+  (let ((prompt (>= (length projects) 3))
+        (deletep t))
+    (dolist (p projects)
+      (if prompt
+          (setf deletep (yes-or-nop "Do you want to delete project %a ?" (description p))))
+      (if deletep
+          (delete-project (id p))))))
