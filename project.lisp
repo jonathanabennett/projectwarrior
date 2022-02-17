@@ -137,9 +137,6 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
                 :inherit-tags (cdr (assoc :inherit-tags json-data))))
 
 
-(defun search-aof (search-term project-list)
-  (remove-if-not (lambda (project) (search search-term (area-of-focus project))) project-list))
-
 (defun where (&key aof tags inherit-tags slug description id)
   #'(lambda (project)
       (and
