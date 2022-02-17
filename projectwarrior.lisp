@@ -21,6 +21,7 @@
 (in-package #:projectwarrior)
 
 (defvar valid-commands '("add" "done" "delete" "del" "modify" "mod" "view"))
+
 (defun add (project-data)
   "This adds a new project to the active.json project list after parsing the string into appropriate variables."
   (let ((user-description '())
@@ -46,14 +47,6 @@
                                                      :area-of-focus user-aof
                                                      :target-list *active-projects-list*))
     (save-projects *active-projects-list* *active-projects-filepath*)))
-
-(defun view-projects (&optional (source :active))
-  "This will filter projects based on a call to `where' before passing that
-filtered list on to `list-projects' for display."
-  (cond
-    ((eq source :completed) (list-projects *completed-projects-list*))
-    ((eq source :deleted)   (list-projects *deleted-projects-list*))
-    (t                      (list-projects *active-projects-list*))))
 
 (defun complete-project (project-num)
   "Find project `project-num' in the `*active-projects-list*', remove it, and append it to the
@@ -106,22 +99,18 @@ filtered list on to `list-projects' for display."
 (defun main (&rest argv)
   "This is the script entry point."
   (declare (ignore argv))
-  (load-projects *active-projects-filepath* :active)
-  (load-projects *completed-projects-filepath* :completed)
-  (load-projects *deleted-projects-filepath* :deleted)
+  (setf *active-projects-list* (load-projects *active-projects-filepath* ))
+  (setf *completed-projects-list* (load-projects *completed-projects-filepath* ))
+  (setf *deleted-projects-list* (load-projects *deleted-projects-filepath* ))
   ;; Add code here to read in ~/.projectwarrior/config.lisp
   ;; If the file doesn't exist, create a default one from the template.
   ;; Primary initial contents will be the review options
   ;; Which will get registered as keyword options after review.
-  (let ((args (uiop/image:command-line-arguments)))
-     (cond
-       ((equal (car args) "help") (help))
-       ((equal (car args) "add") (add (cdr args)))
-       ((equal (car args) "done") (complete-project (cdr args)))
-       ((equal (car args) "delete") (delete-project (cdr args)))
-       ((equal (car args) "review") (projects-review))
-       ((equal (car args) "weekly") (weekly-review))
-       (t (view-projects)))))
+  (command-dispatcher (uiop/image:command-line-arguments))
+  (save-projects *active-projects-list* *active-projects-filepath*)
+  (save-projects *completed-projects-list* *completed-projects-filepath*)
+  (save-projects *deleted-projects-list* *deleted-projects-filepath*)
+  )
 
 (defun command-dispatcher (user-input)
   "After `main' sets up the operational space, the command line args are passed on to this function
@@ -148,7 +137,8 @@ the project(s) being modified."
           ((string= command "view") (list-projects (filter-projects filter)))
           ((string= command "mod") (modify-projects (filter-projects filter) modifications))
           ((string= command "done") (complete-projects (filter-projects filter)))
-          ((string= command "delete") (delete-projects (filter-projects filter))))))
+          ((string= command "delete") (delete-projects (filter-projects filter)))
+          (t (list-projects *active-projects-list*)))))
 
 (defun filter-projects (filter)
   "Filters the list of projects based on the filter supplied"
