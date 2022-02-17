@@ -122,8 +122,7 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
            (output '()))
       (loop for p in data
             for i from 1
-            do(add-to-end output (json->project p i)))
-      (return output))))
+            do(add-to-end output (json->project p i))))))
 
 (defun json->project (json-data id)
   (if (cdr (assoc :id json-data))
