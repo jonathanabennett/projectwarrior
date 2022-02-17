@@ -100,21 +100,21 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
                        :direction :output
                        :if-exists :supersede)
     (cl-json:with-array (out)
-      (dolist (p project-list)
-        (cl-json:as-array-member (out) (cl-json:with-object (out)
-          (cl-json:encode-object-member "uuid" (format nil "~a" (uuid p)) out)
-          (cl-json:encode-object-member "slug" (slug p) out)
-          (cl-json:encode-object-member "description" (description p) out)
-          (cl-json:encode-object-member "areaOfFocus" (area-of-focus p) out)
-          (cl-json:encode-object-member "tags" (tags p) out)
-          (cl-json:encode-object-member "inheritTags" (inherit-tags p) out)))
+      (loop for p in project-list
+            for i from 1
+            do (cl-json:as-array-member (out)
+                 (cl-json:with-object (out)
+                   (cl-json:encode-object-member "id" i out)
+                   (cl-json:encode-object-member "uuid" (format nil "~a" (uuid p)) out)
+                   (cl-json:encode-object-member "slug" (slug p) out)
+                   (cl-json:encode-object-member "description" (description p) out)
+                   (cl-json:encode-object-member "areaOfFocus" (area-of-focus p) out)
+                   (cl-json:encode-object-member "tags" (tags p) out)
+                   (cl-json:encode-object-member "inheritTags" (inherit-tags p) out)))
         (format out "~%")))))
 
 (defun load-projects (filename)
-  (with-open-file (in filename
-                      :if-does-not-exist :create
-                      :direction :input)
-
+  (with-open-file (in filename :if-does-not-exist :create :direction :input)
     (let  ((data
              (if (listen in)
                  (cl-json:decode-json in)
@@ -126,6 +126,8 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
       (return output))))
 
 (defun json->project (json-data id)
+  (if (cdr (assoc :id json-data))
+      (setf id (cdr (assoc :id json-data))))
   (make-project :uuid (cdr (assoc :uuid json-data))
                 :id id
                 :description (cdr (assoc :description json-data))
