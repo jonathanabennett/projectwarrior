@@ -41,12 +41,11 @@
         ((search "+" str) (push (subseq str 1) user-tags))
         ((search "slug:" str) (setq user-slug (subseq str 5)))
         (t (setq user-description (add-to-end user-description str)))))
-    (add-to-end *active-projects-list* (make-project :description (format nil "~{~a~^ ~}" user-description)
+    (setf *active-projects-list* (add-to-end *active-projects-list* (make-project :description (format nil "~{~a~^ ~}" user-description)
                                                      :slug user-slug :tags user-tags
                                                      :inherit-tags user-inherit-tags
-                                                     :area-of-focus user-aof
-                                                     :target-list *active-projects-list*))
-    (save-projects *active-projects-list* *active-projects-filepath*)))
+                                                     :area-of-focus user-aof)))))
+
 
 (defun complete-project (project-num)
   "Find project `project-num' in the `*active-projects-list*', remove it, and append it to the
@@ -123,9 +122,8 @@ command keyword as a filter and then filter the appropriate lists. It should the
 command keyword as a funciton to call and pass anything after the keyword as arguments to apply to
 the project(s) being modified."
   (let ((filter '())
-        (command "")
-        (modifications '())
-        (filtered-list '()))
+        (command)
+        (modifications '()))
     (dolist (term user-input)
       (if command
           (setq modifications (add-to-end modifications term))
@@ -138,7 +136,7 @@ the project(s) being modified."
           ((string= command "mod") (modify-projects (filter-projects filter) modifications))
           ((string= command "done") (complete-projects (filter-projects filter)))
           ((string= command "delete") (delete-projects (filter-projects filter)))
-          (t (list-projects *active-projects-list*)))))
+          (t (list-projects (filter-projects filter))))))
 
 (defun filter-projects (filter)
   "Filters the list of projects based on the filter supplied"
@@ -185,6 +183,6 @@ If `projects' contains more than 3 items, prompt for each.")
         (deletep t))
     (dolist (p projects)
       (if prompt
-          (setf deletep (yes-or-nop "Do you want to delete project %a ?" (description p))))
+          (setf deletep (yes-or-no-p "Do you want to delete project %a ?" (description p))))
       (if deletep
           (delete-project (id p))))))

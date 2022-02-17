@@ -72,11 +72,11 @@ Defaults to `-1' as a flag for the saving function to update the number.")
       (setf uuid (uuid:make-uuid-from-string uuid)))
   (if (eq id nil)
       (setf id -1))
-  (let ((p (make-instance 'project
+  (make-instance 'project
                        :description description
                        :uuid uuid :slug slug :id id
                        :area-of-focus area-of-focus
-                       :tags tags :inherit-tags inherit-tags)))))
+                       :tags tags :inherit-tags inherit-tags))
 
 (defmethod slug= ((p project) str)
   "Check whether or not project `p' has the slug `str'"
@@ -111,7 +111,8 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
                    (cl-json:encode-object-member "areaOfFocus" (area-of-focus p) out)
                    (cl-json:encode-object-member "tags" (tags p) out)
                    (cl-json:encode-object-member "inheritTags" (inherit-tags p) out)))
-        (format out "~%")))))
+        (format out "~%")))
+    (format out "~%")))
 
 (defun load-projects (filename)
   (with-open-file (in filename :if-does-not-exist :create :direction :input)
@@ -122,7 +123,8 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
            (output '()))
       (loop for p in data
             for i from 1
-            do(add-to-end output (json->project p i))))))
+            do (setf output (add-to-end output (json->project p i))))
+      output)))
 
 (defun json->project (json-data id)
   (if (cdr (assoc :id json-data))
