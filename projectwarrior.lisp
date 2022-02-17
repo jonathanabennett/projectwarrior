@@ -20,6 +20,7 @@
 
 (in-package #:projectwarrior)
 
+(defvar valid-commands '("add" "done" "delete" "del" "modify" "mod" "view"))
 (defun add (project-data)
   "This adds a new project to the active.json project list after parsing the string into appropriate variables."
   (let ((user-description '())
@@ -121,3 +122,65 @@ filtered list on to `list-projects' for display."
        ((equal (car args) "review") (projects-review))
        ((equal (car args) "weekly") (weekly-review))
        (t (view-projects)))))
+
+(defun command-dispatcher (user-input)
+  "After `main' sets up the operational space, the command line args are passed on to this function
+which will process them to determine what command to run and what arguments to pass to that command.
+This way, the user can say things like 'project 4 done' instead of 'project done 4' so I can align
+more closely to the taskwarrior interface style. The basic interface style is
+project <filter string> <add|done|delete|modify|view> <project data (optional)>
+So the command dispatcher should interpret all strings found before the first instance of a
+command keyword as a filter and then filter the appropriate lists. It should then interpret the
+command keyword as a funciton to call and pass anything after the keyword as arguments to apply to
+the project(s) being modified."
+  (let ((filter '())
+        (command "")
+        (modifications '())
+        (filtered-list '()))
+    (dolist (term user-input)
+      (if command
+          (setq modifications (add-to-end modifications term))
+          (if (member term valid-commands :test #'string=)
+              (setq command term)
+              (setq filter (add-to-end filter term)))))
+    (cond
+          ((string= command "add") (add modifications))
+          ((string= command "view") (list-projects (filter-projects filter)))
+          ((string= command "mod") (modify-projects (filter-projects filter) modifications))
+          ((string= command "done") (complete-projects (filter-projects filter)))
+          ((string= command "delete") (delete-projects (filter-projects filter))))))
+
+(defun filter-projects (filter)
+  "Filters the list of projects based on the filter supplied"
+  ;; Check which lists to pull from and assemble them into a master list.
+  ;; Th `search-projects' over the list.
+  (let ((aof)
+        (tags '())
+        (inherit-tags '())
+        (slug)
+        (description)
+        (source "active"))
+    (dolist (term filter)
+      (cond
+        ((search "area:" term) (setq aof (subseq term 5)))
+        ((search "++" term) (push (subseq term 2) inherit-tags))
+        ((search "+" term) (push (subseq term 1) tags))
+        ((search "slug:" term) (setq slug (subseq term 5)))
+        ((search "status:" term) (setq source (subseq term 7)))
+        (t (setq description (add-to-end description term)))))
+    (cond
+      ((string= source "active") (search-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description description) (load-projects *active-projects-filepath*)))
+      ((string= source "done") (search-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description description) (load-projects *completed-projects-filepath*)))
+      ((string= source "deleted") (search-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description description) (load-projects *deleted-projects-filepath*))))))
+
+
+(defun complete-projects (projects)
+  "Complete all projects in `projects'. If `projects' is more than 3 itmes, prompt for each
+completion.")
+
+(defun modify-projects (projects modifications)
+  "Modify all projects in the `projects' list with the changes `modification'.
+If `projects' contains more than 3 items, prompt for each.")
+
+(defun delete-projects (projects)
+  "Delete all projects in `projects'. If `projects' is more than 3 itesm, prompt for each.")
