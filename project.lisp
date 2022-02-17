@@ -9,6 +9,12 @@
     :initarg :uuid
     :accessor uuid
     :documentation "The UUID that identifies a project.")
+   (id
+    :initarg :id
+    :initform -1
+    :accessor id
+    :documentation "The project's numeric position within its JSON file when that file was last saved.
+Defaults to `-1' as a flag for the saving function to update the number.")
    (description
     :initarg :description
     :accessor description
@@ -103,7 +109,7 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
           (cl-json:encode-object-member "inheritTags" (inherit-tags p) out)))
         (format out "~%")))))
 
-(defun load-projects (filename &optional (target :active))
+(defun load-projects (filename)
   (with-open-file (in filename
                       :if-does-not-exist :create
                       :direction :input)
@@ -111,26 +117,31 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
     (let  ((data
              (if (listen in)
                  (cl-json:decode-json in)
-                 (cl-json:decode-json-from-string "[]"))))
-      (dolist (p data)
-        (json->project p target)))))
+                 (cl-json:decode-json-from-string "[]")))
+           (output '()))
+      (loop for p in data
+            for i from 1
+            do(add-to-end output (json->project p i)))
+      (return output))))
 
-(defun json->project (json-data target-list)
-  (add-project :uuid (cdr (assoc :uuid json-data))
-               :description (cdr (assoc :description json-data))
-               :slug (cdr (assoc :slug json-data))
-               :area-of-focus (cdr (assoc :AREA-OF-FOCUS json-data))
-               :tags (cdr (assoc :TAGS json-data))
-               :inherit-tags (cdr (assoc :inherit-tags json-data))
-               :target-list target-list))
+(defun json->project (json-data id)
+  (make-project :uuid (cdr (assoc :uuid json-data))
+                :id id
+                :description (cdr (assoc :description json-data))
+                :slug (cdr (assoc :slug json-data))
+                :area-of-focus (cdr (assoc :AREA-OF-FOCUS json-data))
+                :tags (cdr (assoc :TAGS json-data))
+                :inherit-tags (cdr (assoc :inherit-tags json-data))))
+
 
 (defun search-aof (search-term project-list)
   (remove-if-not (lambda (project) (search search-term (area-of-focus project))) project-list))
 
-(defun where (&key aof tags inherit-tags slug description)
+(defun where (&key aof tags inherit-tags slug description id)
   #'(lambda (project)
       (and
        (if aof          (search aof (area-of-focus project)) t)
+       (if id           (eq id (id project)) t)
        (if tags         (member tags (tags project))         t)
        (if inherit-tags (member inherit-tags (inherit-tags project)) t)
        (if slug         (search slug (slug project)) t)
@@ -144,7 +155,6 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
 (defun list-projects (project-list)
   "This function builds an ascii-table table of the projects."
   (let ((table (ascii-table:make-table `("#" "Description" "Area of Focus" "Tags") :header "Projects Report")))
-    (loop for project in project-list
-          for i from 1
-          do (ascii-table:add-row table (list i (description project) (area-of-focus project) (tags project))))
+    (dolist (project project-list)
+      (ascii-table:add-row table (list (id project) (description project) (area-of-focus project) (tags project))))
     (ascii-table:display table)))
