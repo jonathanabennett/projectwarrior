@@ -151,14 +151,60 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
 (defun search-projects (search-fn project-list)
   (remove-if-not search-fn project-list))
 
-(defun update-project (project &key new-id new-description new-slug new-area new-tags new-inherit-tags)
-  (if new-id (setf (id project) new-id))
-  (if new-description (setf (description project) new-description))
-  (if new-slug (setf (slug project) new-slug))
-  (if new-area (setf (area-of-focus project) new-area))
-  (if new-tags (setf (tags project) new-tags))
-  (if new-inherit-tags (setf (inherit-tags project) new-inherit-tags))
-  )
+;; TODO Refactor as a macro to make it easier to add new fields.
+(defun update-projects (selector-fn modifications)
+  (let ((new-id)
+        (new-description)
+        (new-slug)
+        (new-area)
+        (new-tags)
+        (remove-tags)
+        (remove-inherit-tags)
+        (new-inherit-tags))
+    (dolist (term modifications)
+      (cond
+        ((search "area:" term) (setq new-aof (subseq term)))
+        ((search "++" term) (push (subseq term 2) new-inherit-tags))
+        ((search "+" term) (push (subseq term 1) new-tags))
+        ((search "slug" term) (setq new-slug (subseq term 5)))
+        ((search "id:" term) (setq new-id (term)))
+        ((search "--" term (push (subseq term 2) remove-inherit-tags)))
+        ((search "-" term) (push (subseq term 1) remove-tags))
+        (t (setq new-description (add-to-end new-description term)))))
+    (setf *completed-projects-list*
+        (mapcar
+         #'(lambda (project)
+             (when (funcall selector-fn project)
+               (if new-id (setf (id project) new-id))
+               (if new-description (setf (description project) new-description))
+               (if new-slug (setf (slug project) new-slug))
+               (if new-area (setf (area-of-focus project) new-area))
+               (if new-tags (setf (tags project) (append tags new-tags)))
+               (if new-inherit-tags (setf (inherit-tags project) (append inherit-tags new-inherit-tags))))
+             project) *completed-projects-list*))
+  (setf *deleted-projects-list*
+        (mapcar
+         #'(lambda (project)
+             (when (funcall selector-fn project)
+               (if new-id (setf (id project) new-id))
+               (if new-description (setf (description project) new-description))
+               (if new-slug (setf (slug project) new-slug))
+               (if new-area (setf (area-of-focus project) new-area))
+               (if new-tags (setf (tags project) (append (tags project) new-tags)))
+               (if new-inherit-tags (setf (inherit-tags project) (append (inherit-tags project) new-inherit-tags))))
+             project) *deleted-projects-list*))
+  (setf *active-projects-list*
+        (mapcar
+         #'(lambda (project)
+             (when (funcall selector-fn project)
+               (if new-id (setf (id project) new-id))
+               (if new-description (setf (description project) new-description))
+               (if new-slug (setf (slug project) new-slug))
+               (if new-area (setf (area-of-focus project) new-area))
+               (if new-tags (setf (tags project) (append (tags project) new-tags)))
+               (if new-inherit-tags (setf (inherit-tags project) (append (inherit-tags project) new-inherit-tags))))
+             project) *active-projects-list*))))
+
 ;; TODO Replace ascii-table with custom `format' calls so that I can control
 ;; the layout better. The current layout is far too bulky.
 (defun list-projects (project-list)
