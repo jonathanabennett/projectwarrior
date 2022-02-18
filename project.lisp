@@ -137,7 +137,7 @@ Typically called with ~/.cl-gtd/projects.db as the `filename'"
                 :tags (cdr (assoc :TAGS json-data))
                 :inherit-tags (cdr (assoc :inherit-tags json-data))))
 
-
+;; TODO Refactor as a macro to make it easier to add new fields.
 (defun where (&key aof tags inherit-tags slug description id)
   #'(lambda (project)
       (and

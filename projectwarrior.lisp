@@ -71,7 +71,7 @@
   "This guides a user through a review of the projects listed in their *projects-filepath* file."
   (format t "Welcome to your project review. Hold on while sync your projects.")
   (sync-projects-list *projects-filepath*)
-  (let ((active-projects ())
+  (let ((active-projects '())
         (review-list (get-list-from-file *projects-filepath*)))
     (dolist (project review-list)
       (progn
@@ -133,11 +133,13 @@ the project(s) being modified."
     (cond
           ((string= command "add") (add modifications))
           ((string= command "view") (list-projects (filter-projects filter)))
-          ((string= command "mod") (modify-projects (filter-projects filter) modifications))
+          ((string= command "mod") (modify-projects filter modifications))
           ((string= command "done") (complete-projects (filter-projects filter)))
           ((string= command "delete") (delete-projects (filter-projects filter)))
           (t (list-projects (filter-projects filter))))))
 
+;; TODO Rewrite this to create filters rather than apply filters. Then use `search-projects'
+;; and `update-projects' to do the actual filtering
 (defun filter-projects (filter)
   "Filters the list of projects based on the filter supplied"
   ;; Check which lists to pull from and assemble them into a master list.
