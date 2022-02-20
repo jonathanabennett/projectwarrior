@@ -168,7 +168,7 @@ Typically called with ~/.projects/active.json as the `filename'"
         ((search "+" term) (push (subseq term 1) new-tags))
         ((search "slug" term) (setq new-slug (subseq term 5)))
         ((search "id:" term) (setq new-id (term)))
-        ((search "--" term (push (subseq term 2) remove-inherit-tags)))
+        ((search "--" term) (push (subseq term 2) remove-inherit-tags))
         ((search "-" term) (push (subseq term 1) remove-tags))
         (t (setq new-description (add-to-end new-description term)))))
     (setf *completed-projects-list*
@@ -179,8 +179,10 @@ Typically called with ~/.projects/active.json as the `filename'"
                (if new-description (setf (description project) new-description))
                (if new-slug (setf (slug project) new-slug))
                (if new-area (setf (area-of-focus project) new-area))
-               (if new-tags (setf (tags project) (append tags new-tags)))
-               (if new-inherit-tags (setf (inherit-tags project) (append inherit-tags new-inherit-tags))))
+               (if new-tags (setf (tags project) (pushnew (tags project) new-tags :test #'string=)))
+               (if new-inherit-tags (setf (inherit-tags project) (pushnew (inherit-tags project) new-inherit-tags :test #'string=)))
+               (if remove-tags (setf (tags project) (set-difference (tags project) remove-tags :test #'string=)))
+               (if remove-tags (setf (inherit-tags project) (set-difference (inherit-tags project) remove-inherit-tags :test #'string=))))
              project) *completed-projects-list*))
   (setf *deleted-projects-list*
         (mapcar
@@ -190,8 +192,10 @@ Typically called with ~/.projects/active.json as the `filename'"
                (if new-description (setf (description project) new-description))
                (if new-slug (setf (slug project) new-slug))
                (if new-area (setf (area-of-focus project) new-area))
-               (if new-tags (setf (tags project) (append (tags project) new-tags)))
-               (if new-inherit-tags (setf (inherit-tags project) (append (inherit-tags project) new-inherit-tags))))
+               (if new-tags (setf (tags project) (pushnew (tags project) new-tags :test #'string=)))
+               (if new-inherit-tags (setf (inherit-tags project) (pushnew (inherit-tags project) new-inherit-tags :test #'string=)))
+               (if remove-tags (setf (tags project) (set-difference (tags project) remove-tags :test #'string=)))
+               (if remove-tags (setf (inherit-tags project) (set-difference (inherit-tags project) remove-inherit-tags :test #'string=))))
              project) *deleted-projects-list*))
   (setf *active-projects-list*
         (mapcar
@@ -201,8 +205,10 @@ Typically called with ~/.projects/active.json as the `filename'"
                (if new-description (setf (description project) new-description))
                (if new-slug (setf (slug project) new-slug))
                (if new-area (setf (area-of-focus project) new-area))
-               (if new-tags (setf (tags project) (append (tags project) new-tags)))
-               (if new-inherit-tags (setf (inherit-tags project) (append (inherit-tags project) new-inherit-tags))))
+               (if new-tags (setf (tags project) (pushnew (tags project) new-tags :test #'string=)))
+               (if new-inherit-tags (setf (inherit-tags project) (pushnew (inherit-tags project) new-inherit-tags :test #'string=)))
+               (if remove-tags (setf (tags project) (set-difference (tags project) remove-tags :test #'string=)))
+               (if remove-tags (setf (inherit-tags project) (set-difference (inherit-tags project) remove-inherit-tags :test #'string=))))
              project) *active-projects-list*))))
 
 ;; TODO Replace ascii-table with custom `format' calls so that I can control
