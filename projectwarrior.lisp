@@ -22,6 +22,9 @@
 
 (defvar valid-commands '("add" "done" "delete" "del" "modify" "mod" "view"))
 
+(defun add-from-string (project-data)
+  (add (cl-utilities:split-sequence " " project-data :test #'string=)))
+
 (defun add (project-data)
   "This adds a new project to the active.json project list after parsing the string into appropriate variables."
   (let ((user-description '())
@@ -68,23 +71,22 @@
 ;; TODO Rewrite this to use the new `PROJECT' class
 ;; Look up tasks using the `slug' field on the `PROJECT' object.
 (defun projects-review ()
-  "This guides a user through a review of the projects listed in their *projects-filepath* file."
-  (format t "Welcome to your project review. Hold on while sync your projects.")
-  (sync-projects-list *projects-filepath*)
+  "This guides a user through a review of the projects listed in `*active-projects-list*' file."
+  (format t "Welcome to your project review.")
   (let ((active-projects '())
-        (review-list (get-list-from-file *projects-filepath*)))
-    (dolist (project review-list)
-      (progn
-        (format t "~%~%~%~%Project: ~A~%" project)
-        (list-tasks project)
-        (let ((response (ask-until-valid '("a" "b" "d") "Is your project [a]ctive, [c]ompleted, or [d]eleted? ")))
-          (cond
-            ((equal response "a") (push project active-projects))
-            ((equal response "c") ())
-            ((equal response "d") ())
-            (t (push project active-projects))))))
-    (with-open-file (f *projects-filepath* :direction :output :if-exists :supersede)
-      (format f "~{~A~%~}" active-projects))))
+        (completed-projects '())
+        (deleted-projects '()))
+    (loop project in *active-projects-list*
+          i from 1
+          do (format t "~%~%~%~%Project: ~A~%" (description project))
+             (list-tasks (slug project))
+             (let ((response (ask-until-valid '("a" "c" "d") "Is this project [a]ctive, [c]ompleted, or [d]eleted? ")))
+               (cond
+                 ((equal response "c") (push project completed-projects))
+                 ((equal response "d") (push project deleted-projects))
+                 (t (push project active-projects)))))
+    (complete-projects completed-projects)
+    (delete-projects deleted-projects)))
 
 (defun help ()
   "Print out the help."

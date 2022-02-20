@@ -47,6 +47,23 @@
       (let ((cmd-string (format nil "task add ~A ~A" context user-string)))
         (uiop:run-program cmd-string :ignore-error-status t :output :string))))
 
+(defun add-projects-until-enter ()
+  "Adds projects to the `*active-projects-list*' via the `add-from-string' function until the user
+hits enter on an empty line. This relies on the changes being saved at the end by the `main' function."
+  (loop with leave = nil
+        with user-input = nil
+        with project-string = nil
+        while (null leave)
+        do (format t "Add a project to projectwarrior.~%")
+           (write-string "Enter the task project here or hit enter to continue without adding a project:")
+           (finish-output)
+           (setq user-input (read-line))
+        if (equal user-input "")
+          do (setq leave t)
+        else do (clear-input)
+                (add-from-string (project-string))
+                (terpri)))
+
 (defun add-until-enter (context)
   (loop with leave = nil
         with user-input = nil
