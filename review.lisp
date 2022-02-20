@@ -11,6 +11,10 @@
 ;; TODO Restructure this so it adds projects AND Tasks
 (in-package #:projectwarrior)
 
+(defmacro make-review (review-prompts &key projectsp tasksp projects-context tasks-context)
+  "Generates the reviews below from a shorter format that should be easier for non-lispers"
+  )
+
 (defun clear-inboxes ()
   "This function reminds the user to clear their inboxes."
   (write-line "Take each of your inboxes and process all messages into your system.")
