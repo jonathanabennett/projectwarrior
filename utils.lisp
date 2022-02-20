@@ -2,7 +2,7 @@
 
 (in-package #:projectwarrior)
 
-(defparameter *projects-filepath* (uiop:native-namestring "~/.cl-gtd/projects.txt"))
+(defparameter *projects-filepath* (uiop:native-namestring "~/.projects/projects.txt"))
 
 (defun get-new-projects-list ()
   "Gets a list of the current projects from taskwarrior. rc.hooks=off is needed to prevent infinite loops."

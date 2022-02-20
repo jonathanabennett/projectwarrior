@@ -95,7 +95,7 @@ slug: description"
 
 (defun save-projects (project-list filename)
   "Save the `project-list' to file.
-Typically called with ~/.cl-gtd/projects.db as the `filename'"
+Typically called with ~/.projects/active.json as the `filename'"
   (with-open-file (out filename
                        :direction :output
                        :if-exists :supersede)

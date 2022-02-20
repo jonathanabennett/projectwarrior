@@ -28,7 +28,7 @@ Once you have SBCL and Quicklisp setup according to the instructions on their we
 
 ### Add
 
-Run `project add <project>` to add `<project>` to the `/.cl-gtd/projects.txt` file. `<project>` should be in a format acceptable to Taskwarrior as a project (no spaces). This adds nothing to taskwarrior, but it does ensure that you will see this project when you do your next review.
+Run `project add <project>` to add `<project>` to the `/.projects/projects.txt` file. `<project>` should be in a format acceptable to Taskwarrior as a project (no spaces). This adds nothing to taskwarrior, but it does ensure that you will see this project when you do your next review.
 
 ### Projects
 

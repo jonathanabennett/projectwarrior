@@ -13,8 +13,11 @@
 LISP ?= sbcl
 
 hook:
-	mkdir -p ~/.cl-gtd
-	touch ~/.cl-gtd/projects.txt
+	mkdir -p ~/.projects
+	touch ~/.projects/projects.txt
+	touch ~/.projects/active.json
+	touch ~/.projects/completed.json
+	touch ~/.projects/deleted.json
 	$(LISP) --eval "(require 'asdf)" \
 		--load projectwarrior.asd \
 		--eval '(ql:quickload :projectwarrior/tw-hook)' \
@@ -23,8 +26,11 @@ hook:
 	mv ./on-exit-projects-list ~/.task/hooks/on-exit-projects-list
 
 build:
-	mkdir -p ~/.cl-gtd
-	touch ~/.cl-gtd/projects.txt
+	mkdir -p ~/.projects
+	touch ~/.projects/projects.txt
+	touch ~/.projects/active.json
+	touch ~/.projects/completed.json
+	touch ~/.projects/deleted.json
 	$(LISP) --eval "(require 'asdf)" \
 		--load projectwarrior.asd \
 		--eval '(ql:quickload :projectwarrior)' \

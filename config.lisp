@@ -8,7 +8,7 @@
 (in-package #:projectwarrior)
 
 ;; General
-(defvar *data-folder* (uiop:native-namestring "~/.cl-gtd/") "Folder where data is stored.")
+(defvar *data-folder* (uiop:native-namestring "~/.projects/") "Folder where data is stored.")
 (defvar *active-projects-filepath* (uiop:native-namestring
                              (concatenate 'string *data-folder* "active.json")))
 (defvar *completed-projects-filepath* (uiop:native-namestring
