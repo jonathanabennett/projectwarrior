@@ -23,7 +23,8 @@
 (defvar valid-commands '("add" "done" "delete" "del" "modify" "mod" "view" "review"))
 
 (defun add-from-string (project-data)
-  (add (cl-utilities:split-sequence " " project-data :test #'string=)))
+  (add (cl-utilities:split-sequence " " project-data :test #'string=))
+  (save-projects *active-projects-list* *active-projects-filepath*))
 
 (defun add (project-data)
   "This adds a new project to the active.json project list after parsing the string into appropriate variables."
