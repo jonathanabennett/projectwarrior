@@ -61,7 +61,7 @@ hits enter on an empty line. This relies on the changes being saved at the end b
         if (equal user-input "")
           do (setq leave t)
         else do (clear-input)
-                (add-from-string (project-string))
+                (add-from-string project-string)
                 (terpri)))
 
 (defun add-until-enter (context)

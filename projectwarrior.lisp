@@ -20,7 +20,7 @@
 
 (in-package #:projectwarrior)
 
-(defvar valid-commands '("add" "done" "delete" "del" "modify" "mod" "view"))
+(defvar valid-commands '("add" "done" "delete" "del" "modify" "mod" "view" "review"))
 
 (defun add-from-string (project-data)
   (add (cl-utilities:split-sequence " " project-data :test #'string=)))
@@ -76,8 +76,8 @@
   (let ((active-projects '())
         (completed-projects '())
         (deleted-projects '()))
-    (loop project in *active-projects-list*
-          i from 1
+    (loop for project in *active-projects-list*
+          for i from 1
           do (format t "~%~%~%~%Project: ~A~%" (description project))
              (list-tasks (slug project))
              (let ((response (ask-until-valid '("a" "c" "d") "Is this project [a]ctive, [c]ompleted, or [d]eleted? ")))
@@ -138,6 +138,7 @@ the project(s) being modified."
           ((string= command "mod") (modify-projects filter modifications))
           ((string= command "done") (complete-projects (filter-projects filter)))
           ((string= command "delete") (delete-projects (filter-projects filter)))
+          ((string= command "review") (weekly-review))
           (t (list-projects (filter-projects filter))))))
 
 ;; TODO Rewrite this to create filters rather than apply filters. Then use `search-projects'
