@@ -44,11 +44,11 @@
         ((search "++" str) (push (subseq str 2) user-inherit-tags))
         ((search "+" str) (push (subseq str 1) user-tags))
         ((search "slug:" str) (setq user-slug (subseq str 5)))
-        (t (setq user-description (add-to-end user-description str)))))
-    (setf *active-projects-list* (add-to-end *active-projects-list* (make-project :description (format nil "~{~a~^ ~}" user-description)
+        (t (add-to-end user-description str))))
+    (add-to-end *active-projects-list* (make-project :description (format nil "~{~a~^ ~}" user-description)
                                                      :slug user-slug :tags user-tags
                                                      :inherit-tags user-inherit-tags
-                                                     :area-of-focus user-aof)))))
+                                                     :area-of-focus user-aof))))
 
 
 (defun complete-project (project-num)
@@ -56,7 +56,7 @@
 `*completed-projects-list*'. Then save both project lists to file."
   (let ((project (nth (- project-num 1) *active-projects-list*)))
     (setq *active-projects-list* (remove project *active-projects-list*))
-    (setq *completed-projects-list* (add-to-end *completed-projects-list* project)))
+    (add-to-end *completed-projects-list* project))
   (save-projects *active-projects-list* *active-projects-filepath*)
   (save-projects *completed-projects-list* *completed-projects-filepath*))
 
@@ -65,7 +65,7 @@
 `*deleted-projects-list*'. Then save both project lists to file."
   (let ((project (nth (- project-num 1) *active-projects-list*)))
     (setq *active-projects-list* (remove project *active-projects-list*))
-    (setq *deleted-projects-list (add-to-end *completed-projects-list* project)))
+    (add-to-end *completed-projects-list* project))
   (save-projects *active-projects-list* *active-projects-filepath*)
   (save-projeects *deleted-projects-list* *deleted-projects-filepath*))
 
@@ -129,10 +129,10 @@ the project(s) being modified."
         (modifications '()))
     (dolist (term user-input)
       (if command
-          (setq modifications (add-to-end modifications term))
+          (add-to-end modifications term)
           (if (member term valid-commands :test #'string=)
               (setq command term)
-              (setq filter (add-to-end filter term)))))
+              (add-to-end filter term))))
     (cond
           ((string= command "add") (add modifications))
           ((string= command "view") (list-projects (filter-projects filter)))
@@ -157,21 +157,22 @@ the project(s) being modified."
         (source "active"))
     (dolist (term filter)
       (cond
+        ((and (every #'digit-char-p term) (not id)) (setq id (parse-integer term)))
         ((search "area:" term) (setq aof (subseq term 5)))
         ((search "++" term) (push (subseq term 2) inherit-tags))
         ((search "+" term) (push (subseq term 1) tags))
         ((search "slug:" term) (setq slug (subseq term 5)))
         ((search "status:" term) (setq source (subseq term 7)))
-        (t (setq description (add-to-end description term)))))
+        (t (add-to-end description term))))
     (cond
       ((string= source "active") (search-projects
-                                  (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug
+                                  (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :id id
                                          :description (format nil "~{~a~^ ~}" description)) *active-projects-list*))
       ((string= source "done") (search-projects
-                                (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug
+                                (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :id id
                                        :description (format nil "~{~a~^ ~}" description)) *completed-projects-list*))
       ((string= source "deleted") (search-projects
-                                   (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug
+                                   (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :id id
                                           :description (format nil "~{~a~^ ~}" description)) *deleted-projects-list*)))))
 
 (defun modify-projects (filter modifications)
@@ -186,7 +187,7 @@ the project(s) being modified."
         ((search "++" term) (push (subseq term 2) inherit-tags))
         ((search "+" term) (push (subseq term 1) tags))
         ((search "slug:" term) (setq slug (subseq term 5)))
-        (t (setq description (add-to-end description term)))))
+        (t (add-to-end description term))))
     (update-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description (format nil "~{~a~^ ~}" description)) modifications)))
 
 (defun complete-projects (projects)
@@ -196,7 +197,7 @@ completion."
         (completep t))
     (dolist (p projects)
       (if prompt
-          (setf completep (yes-or-no-p "Do you want to complete project %a? " (description p))))
+          (setf completep (yes-or-no-p "Do you want to complete project ~a? " (description p))))
       (if completep
           (complete-project (id p))))))
 
@@ -206,6 +207,6 @@ completion."
         (deletep t))
     (dolist (p projects)
       (if prompt
-          (setf deletep (yes-or-no-p "Do you want to delete project %a ?" (description p))))
+          (setf deletep (yes-or-no-p "Do you want to delete project ~a ?" (description p))))
       (if deletep
           (delete-project (id p))))))

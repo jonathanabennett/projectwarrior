@@ -123,7 +123,7 @@ Typically called with ~/.projects/active.json as the `filename'"
            (output '()))
       (loop for p in data
             for i from 1
-            do (setf output (add-to-end output (json->project p i))))
+            do (add-to-end output (json->project p i)))
       output)))
 
 (defun json->project (json-data id)
@@ -167,10 +167,10 @@ Typically called with ~/.projects/active.json as the `filename'"
         ((search "++" term) (push (subseq term 2) new-inherit-tags))
         ((search "+" term) (push (subseq term 1) new-tags))
         ((search "slug" term) (setq new-slug (subseq term 5)))
-        ((search "id:" term) (setq new-id (term)))
+        ((search "id:" term) (setq new-id (parse-integer term :junk-allowed t)))
         ((search "--" term) (push (subseq term 2) remove-inherit-tags))
         ((search "-" term) (push (subseq term 1) remove-tags))
-        (t (setq new-description (add-to-end new-description term)))))
+        (t (add-to-end new-description term))))
     (setf *completed-projects-list*
         (mapcar
          #'(lambda (project)
@@ -215,7 +215,7 @@ Typically called with ~/.projects/active.json as the `filename'"
 ;; the layout better. The current layout is far too bulky.
 (defun list-projects (project-list)
   "This function builds an ascii-table table of the projects."
-  (let ((table (ascii-table:make-table `("#" "Description" "Area of Focus" "Tags") :header "Projects Report")))
+  (let ((table (ascii-table:make-table `("#" "Description" "Area of Focus" "Tags" "Slug") :header "Projects Report")))
     (dolist (project project-list)
-      (ascii-table:add-row table (list (id project) (description project) (area-of-focus project) (tags project))))
+      (ascii-table:add-row table (list (id project) (description project) (area-of-focus project) (tags project) (slug project))))
     (ascii-table:display table)))
