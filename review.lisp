@@ -710,6 +710,7 @@
   (clear-inboxes)
   (professional-tickler)
   (personal-tickler)
+  (projects-review)
   (calendar-review)
   (someday-maybe)
   (get-creative))

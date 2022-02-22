@@ -85,18 +85,21 @@
                (cond
                  ((equal response "c") (push project completed-projects))
                  ((equal response "d") (push project deleted-projects))
-                 (t (push project active-projects)))))
+                 (t (push project active-projects)
+                    (add-until-enter (format nil "project:~a ~{+~a ~} " (slug project) (tags project)))))))
     (complete-projects completed-projects)
     (delete-projects deleted-projects)))
 
 (defun help ()
   "Print out the help."
-  (format t "USAGE: projectwarrior <subcommand> <project>")
-  (format t "add <project>: Add <project> as a project.")
-  (format t "Project should be in the same format as a taskwarrior project.")
-  (format t "help: Display this message.")
-  (format t "review: Conduct a guided weekly review.")
-  (format t "projects: Review your projects."))
+  (format t "USAGE: project <filter> <command> <information>")
+  (format t "add <information>: Add <information> as a project.")
+  (format t "<filter> mod <information>: Modify the projects selected by <filter> with <information>.")
+  (format t "<filter> view: Display projects matching <filter>.")
+  (format t "<filter> done: Mark projects matching <filter> complete.")
+  (format t "<filter> delete: Delete projects matching <filter>.")
+  (format t "review <projects|weekly|professional|personal: Conduct a guided review of the selected type.")
+  (format t "help: Display this message."))
 
 (defun main (&rest argv)
   "This is the script entry point."
@@ -139,8 +142,19 @@ the project(s) being modified."
           ((string= command "mod") (modify-projects filter modifications))
           ((string= command "done") (complete-projects (filter-projects filter)))
           ((string= command "delete") (delete-projects (filter-projects filter)))
-          ((string= command "review") (weekly-review))
+          ((string= command "review") (review-dispatcher modifications))
+          ((string= command "help") (help))
           (t (list-projects (filter-projects filter))))))
+
+(defun review-dispatcher (input)
+  "Select the review to conduct based on user input. In the case there is no input, give them the
+`weekly-review'"
+  (cond
+    ((string= (car input) "projects") (projects-review))
+    ((string= (car input) "weekly") (weekly-review))
+    ((string= (car input) "personal") (personal-tickler))
+    ((string= (car input) "professional") (professional-tickler))
+    (t (weekly-review))))
 
 ;; TODO Rewrite this to create filters rather than apply filters. Then use `search-projects'
 ;; and `update-projects' to do the actual filtering
@@ -176,6 +190,7 @@ the project(s) being modified."
                                           :description (format nil "~{~a~^ ~}" description)) *deleted-projects-list*)))))
 
 (defun modify-projects (filter modifications)
+  "Modify the projects selected by `filter' with `modifications'."
   (let ((aof)
         (tags '())
         (inherit-tags '())
