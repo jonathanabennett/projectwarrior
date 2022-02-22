@@ -20,7 +20,7 @@
 
 (in-package #:projectwarrior)
 
-(defvar valid-commands '("add" "done" "delete" "del" "modify" "mod" "view" "review"))
+(defvar valid-commands '("add" "done" "delete" "del" "modify" "mod" "view" "review" "help"))
 
 (defun add-from-string (project-data)
   (add (cl-utilities:split-sequence " " project-data :test #'string=))
@@ -92,14 +92,14 @@
 
 (defun help ()
   "Print out the help."
-  (format t "USAGE: project <filter> <command> <information>")
-  (format t "add <information>: Add <information> as a project.")
-  (format t "<filter> mod <information>: Modify the projects selected by <filter> with <information>.")
-  (format t "<filter> view: Display projects matching <filter>.")
-  (format t "<filter> done: Mark projects matching <filter> complete.")
-  (format t "<filter> delete: Delete projects matching <filter>.")
-  (format t "review <projects|weekly|professional|personal: Conduct a guided review of the selected type.")
-  (format t "help: Display this message."))
+  (write-string "USAGE: project <filter> <command> <information>")
+  (write-string "add <information>: Add <information> as a project.")
+  (write-string "<filter> mod <information>: Modify the projects selected by <filter> with <information>.")
+  (write-string "<filter> view: Display projects matching <filter>.")
+  (write-string "<filter> done: Mark projects matching <filter> complete.")
+  (write-string "<filter> delete: Delete projects matching <filter>.")
+  (write-string "review <projects|weekly|professional|personal: Conduct a guided review of the selected type.")
+  (write-string "help: Display this message."))
 
 (defun main (&rest argv)
   "This is the script entry point."
