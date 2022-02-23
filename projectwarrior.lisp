@@ -189,11 +189,7 @@ the project(s) being modified."
 
 (defun modify-projects (filter modifications)
   "Modify the projects selected by `filter' with `modifications'."
-  (let ((aof)
-        (tags '())
-        (inherit-tags '())
-        (slug)
-        (description))
+  (let (aof tags inherit-tags slug description)
     (dolist (term filter)
       (cond
         ((search "area:" term) (setq aof (subseq term 5)))

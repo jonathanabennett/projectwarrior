@@ -61,10 +61,10 @@ Taskwarrior passes in all kinds of additional information, we ignore it as we do
   "Compare two tasks and sort them based on urgency."
   (> (urgency t1) (urgency t2)))
 
-(defmethod display ((tsk task))
+(defmethod display ((task task))
   "Formats tasks for display on the string TSK is a `TASK' object."
   (let ((width (uiop:getenv "COLUMNS")))
-    (format nil "~0,1,10A~,0,1,10A~A" (task-desc tsk) (task-status tsk) (urgency tsk))))
+    (format nil "~0,1,10A~,0,1,10A~A" (task-desc task) (task-status task) (urgency task))))
 
 (defun task-from-hash (t-hash)
   "Given a hash as produced by taskwarrior export, create a `TASK' instance. T-HASH must be a hash."
