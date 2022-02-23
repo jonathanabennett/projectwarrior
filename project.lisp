@@ -153,17 +153,10 @@ Typically called with ~/.projects/active.json as the `filename'"
 
 ;; TODO Refactor as a macro to make it easier to add new fields.
 (defun update-projects (selector-fn modifications)
-  (let ((new-id)
-        (new-description)
-        (new-slug)
-        (new-area)
-        (new-tags)
-        (remove-tags)
-        (remove-inherit-tags)
-        (new-inherit-tags))
+  (let (new-id new-description new-slug new-area new-tags remove-tags remove-inherit-tags new-inherit-tags)
     (dolist (term modifications)
       (cond
-        ((search "area:" term) (setq new-aof (subseq term)))
+        ((search "area:" term) (setq new-aof (subseq term 5)))
         ((search "++" term) (push (subseq term 2) new-inherit-tags))
         ((search "+" term) (push (subseq term 1) new-tags))
         ((search "slug" term) (setq new-slug (subseq term 5)))

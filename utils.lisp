@@ -19,12 +19,12 @@
   (uiop:read-file-lines file))
 
 ;; TODO Rewrite so the hook uses the new format for projects.
-(defun sync-projects-list (file)
+(defun sync-projects-list ()
   "Compare the list of projects stored in projectwarrior to the list of projects from taskwarrior and keep the union of these two sets"
   (let* ((new-projects (get-new-projects-list)))
     (dolist (project-string new-projects)
       (let ((p (project-from-taskwarrior project-string)))
-        (if (not (member p *active-projects-list* :test #'string= :key (lambda (p) (slot-value x slug))))
+        (if (not (member p *active-projects-list* :test #'string= :key (lambda (x) (slot-value x slug))))
             (append *active-projects-list* (list p)))))))
 
 (defun ask-until-valid (valid-response-list prompt)

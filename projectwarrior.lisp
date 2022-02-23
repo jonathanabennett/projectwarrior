@@ -20,7 +20,7 @@
 
 (in-package #:projectwarrior)
 
-(defvar valid-commands '("add" "done" "delete" "del" "modify" "mod" "view" "review" "help"))
+(defvar *valid-commands* '("add" "done" "delete" "del" "modify" "mod" "view" "review" "help"))
 
 (defun add-from-string (project-data)
   (add (cl-utilities:split-sequence " " project-data :test #'string=))
@@ -127,13 +127,11 @@ So the command dispatcher should interpret all strings found before the first in
 command keyword as a filter and then filter the appropriate lists. It should then interpret the
 command keyword as a funciton to call and pass anything after the keyword as arguments to apply to
 the project(s) being modified."
-  (let ((filter '())
-        (command)
-        (modifications '()))
+  (let (filter command modifications)
     (dolist (term user-input)
       (if command
           (add-to-end modifications term)
-          (if (member term valid-commands :test #'string=)
+          (if (member term *valid-commands* :test #'string=)
               (setq command term)
               (add-to-end filter term))))
     (cond
