@@ -67,7 +67,7 @@
     (setq *active-projects-list* (remove project *active-projects-list*))
     (add-to-end *completed-projects-list* project))
   (save-projects *active-projects-list* *active-projects-filepath*)
-  (save-projeects *deleted-projects-list* *deleted-projects-filepath*))
+  (save-projects *deleted-projects-list* *deleted-projects-filepath*))
 
 ;; TODO Rewrite this to use the new `PROJECT' class
 ;; Look up tasks using the `slug' field on the `PROJECT' object.
