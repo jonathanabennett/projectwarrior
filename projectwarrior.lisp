@@ -28,28 +28,7 @@
 
 (defun add (project-data)
   "This adds a new project to the active.json project list after parsing the string into appropriate variables."
-  (let ((user-description '())
-        (user-slug "")
-        (user-aof "")
-        (user-tags '())
-        (user-inherit-tags '()))
-    ;; If the args include a string in the format "area:<area-of-focus>", make it the value of `user-aof'.
-    ;; If the args include a string in the format "slug:<custom-slug>, make it the value of `user-slug'.
-    ;; Collect all the args that begin with a single "+" and add them to the `user-tags' list
-    ;; Collect all the args that begin with "++" and add them to `user-inherit-tags' list.
-    ;; Any args not collected by the above filters are collected into the `user-description' variable.
-    (dolist (str project-data)
-      (cond
-        ((search "area:" str) (setq user-aof (subseq str 5)))
-        ((search "++" str) (push (subseq str 2) user-inherit-tags))
-        ((search "+" str) (push (subseq str 1) user-tags))
-        ((search "slug:" str) (setq user-slug (subseq str 5)))
-        (t (add-to-end user-description str))))
-    (add-to-end *active-projects-list* (make-project :description (format nil "~{~a~^ ~}" user-description)
-                                                     :slug user-slug :tags user-tags
-                                                     :inherit-tags user-inherit-tags
-                                                     :area-of-focus user-aof))))
-
+  (add-to-end *active-project-list* (project-from-list (project-data))))
 
 (defun complete-project (project-num)
   "Find project `project-num' in the `*active-projects-list*', remove it, and append it to the
@@ -137,7 +116,7 @@ the project(s) being modified."
     (cond
           ((string= command "add") (add modifications))
           ((string= command "view") (list-projects (filter-projects filter)))
-          ((string= command "mod") (modify-projects filter modifications))
+          ((string= command "mod") (update-projects (filter-projects filter) modifications))
           ((string= command "done") (complete-projects (filter-projects filter)))
           ((string= command "delete") (delete-projects (filter-projects filter)))
           ((string= command "review") (review-dispatcher modifications))
@@ -156,48 +135,14 @@ the project(s) being modified."
 
 ;; TODO Rewrite this to create filters rather than apply filters. Then use `search-projects'
 ;; and `update-projects' to do the actual filtering
-(defun filter-projects (filter)
-  "Filters the list of projects based on the filter supplied"
-  ;; Check which lists to pull from and assemble them into a master list.
-  ;; Th `search-projects' over the list.
-  (let ((aof)
-        (tags '())
-        (inherit-tags '())
-        (slug)
-        (id)
-        (description)
-        (source "active"))
-    (dolist (term filter)
-      (cond
-        ((and (every #'digit-char-p term) (not id)) (setq id (parse-integer term)))
-        ((search "area:" term) (setq aof (subseq term 5)))
-        ((search "++" term) (push (subseq term 2) inherit-tags))
-        ((search "+" term) (push (subseq term 1) tags))
-        ((search "slug:" term) (setq slug (subseq term 5)))
-        ((search "status:" term) (setq source (subseq term 7)))
-        (t (add-to-end description term))))
-    (cond
-      ((string= source "active") (search-projects
-                                  (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :id id
-                                         :description (format nil "~{~a~^ ~}" description)) *active-projects-list*))
-      ((string= source "done") (search-projects
-                                (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :id id
-                                       :description (format nil "~{~a~^ ~}" description)) *completed-projects-list*))
-      ((string= source "deleted") (search-projects
-                                   (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :id id
-                                          :description (format nil "~{~a~^ ~}" description)) *deleted-projects-list*)))))
 
-(defun modify-projects (filter modifications)
-  "Modify the projects selected by `filter' with `modifications'."
-  (let (aof tags inherit-tags slug description)
-    (dolist (term filter)
-      (cond
-        ((search "area:" term) (setq aof (subseq term 5)))
-        ((search "++" term) (push (subseq term 2) inherit-tags))
-        ((search "+" term) (push (subseq term 1) tags))
-        ((search "slug:" term) (setq slug (subseq term 5)))
-        (t (add-to-end description term))))
-    (update-projects (where :aof aof :tags tags :inherit-tags inherit-tags :slug slug :description (format nil "~{~a~^ ~}" description)) modifications)))
+(defun filter-projects (filter)
+  (multiple-value-bind (filt block-tags block-inherit-tags source) (project-from-list filter)
+    (cond
+      ((string= source "active") (search-projects (where filt) *active-projects-list*))
+      ((string= source "completed") (search-projects (where filt) *completed-projects-list))
+      ((string= source "deleted") (search-projects (where filt) *deleted-projects-list))
+      (t (search-projects (where filt) *active-projects-list*)))))
 
 (defun complete-projects (projects)
   "Complete all projects in `projects'. If `projects' is more than 3 itmes, prompt for each

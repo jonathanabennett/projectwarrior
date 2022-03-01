@@ -70,8 +70,6 @@ Defaults to `-1' as a flag for the saving function to update the number.")
   (if (eq uuid nil)
       (setf uuid (uuid:make-v5-uuid uuid::+namespace-dns+ slug))
       (setf uuid (uuid:make-uuid-from-string uuid)))
-  (if (eq id nil)
-      (setf id -1))
   (make-instance 'project
                        :description description
                        :uuid uuid :slug slug :id id
@@ -137,72 +135,33 @@ Typically called with ~/.projects/active.json as the `filename'"
                 :tags (cdr (assoc :TAGS json-data))
                 :inherit-tags (cdr (assoc :inherit-tags json-data))))
 
-;; TODO Refactor as a macro to make it easier to add new fields.
-(defun where (&key aof tags inherit-tags slug description id)
+(defun where (comp)
+  "Takes a project and matches other projects which match that project"
   #'(lambda (project)
       (and
-       (if aof          (search aof (area-of-focus project)) t)
-       (if id           (eq id (id project)) t)
-       (if tags         (member tags (tags project))         t)
-       (if inherit-tags (member inherit-tags (inherit-tags project)) t)
-       (if slug         (search slug (slug project)) t)
-       (if description  (search description (description project)) t))))
+       (if (area-of-focus comp) (search (area-of-focus comp) (area-of-focus project)) t)
+       (if (id comp)            (eq (id comp) (id project)) t)
+       (if (tags comp)          (member (tags comp) (tags project)) t)
+       (if (inherit-tags comp)  (member (inherit-tags comp) (inherit-tags project)) t)
+       (if (slug comp)          (search (slug comp) (slug project)) t)
+       (if (description comp)   (search (description comp) (description project)) t))))
 
 (defun search-projects (search-fn project-list)
   (remove-if-not search-fn project-list))
 
 ;; TODO Refactor as a macro to make it easier to add new fields.
-(defun update-projects (selector-fn modifications)
-  (let (new-id new-description new-slug new-area new-tags remove-tags remove-inherit-tags new-inherit-tags)
-    (dolist (term modifications)
-      (cond
-        ((search "area:" term) (setq new-aof (subseq term 5)))
-        ((search "++" term) (push (subseq term 2) new-inherit-tags))
-        ((search "+" term) (push (subseq term 1) new-tags))
-        ((search "slug" term) (setq new-slug (subseq term 5)))
-        ((search "id:" term) (setq new-id (parse-integer term :junk-allowed t)))
-        ((search "--" term) (push (subseq term 2) remove-inherit-tags))
-        ((search "-" term) (push (subseq term 1) remove-tags))
-        (t (add-to-end new-description term))))
-    (setf *completed-projects-list*
-        (mapcar
-         #'(lambda (project)
-             (when (funcall selector-fn project)
-               (if new-id (setf (id project) new-id))
-               (if new-description (setf (description project) new-description))
-               (if new-slug (setf (slug project) new-slug))
-               (if new-area (setf (area-of-focus project) new-area))
-               (if new-tags (setf (tags project) (pushnew (tags project) new-tags :test #'string=)))
-               (if new-inherit-tags (setf (inherit-tags project) (pushnew (inherit-tags project) new-inherit-tags :test #'string=)))
-               (if remove-tags (setf (tags project) (set-difference (tags project) remove-tags :test #'string=)))
-               (if remove-tags (setf (inherit-tags project) (set-difference (inherit-tags project) remove-inherit-tags :test #'string=))))
-             project) *completed-projects-list*))
-  (setf *deleted-projects-list*
-        (mapcar
-         #'(lambda (project)
-             (when (funcall selector-fn project)
-               (if new-id (setf (id project) new-id))
-               (if new-description (setf (description project) new-description))
-               (if new-slug (setf (slug project) new-slug))
-               (if new-area (setf (area-of-focus project) new-area))
-               (if new-tags (setf (tags project) (pushnew (tags project) new-tags :test #'string=)))
-               (if new-inherit-tags (setf (inherit-tags project) (pushnew (inherit-tags project) new-inherit-tags :test #'string=)))
-               (if remove-tags (setf (tags project) (set-difference (tags project) remove-tags :test #'string=)))
-               (if remove-tags (setf (inherit-tags project) (set-difference (inherit-tags project) remove-inherit-tags :test #'string=))))
-             project) *deleted-projects-list*))
-  (setf *active-projects-list*
-        (mapcar
-         #'(lambda (project)
-             (when (funcall selector-fn project)
-               (if new-id (setf (id project) new-id))
-               (if new-description (setf (description project) new-description))
-               (if new-slug (setf (slug project) new-slug))
-               (if new-area (setf (area-of-focus project) new-area))
-               (if new-tags (setf (tags project) (pushnew (tags project) new-tags :test #'string=)))
-               (if new-inherit-tags (setf (inherit-tags project) (pushnew (inherit-tags project) new-inherit-tags :test #'string=)))
-               (if remove-tags (setf (tags project) (set-difference (tags project) remove-tags :test #'string=)))
-               (if remove-tags (setf (inherit-tags project) (set-difference (inherit-tags project) remove-inherit-tags :test #'string=))))
-             project) *active-projects-list*))))
+(defun update-projects (projects modifications)
+  (multiple-value-bind (diff remove-tags remove-inherit-tags) (project-from-list modifications)
+    (mapcar
+      #'(lambda (p)
+          (if (id diff) (setf (id p) (id diff)))
+          (if (description diff) (setf (description p) (description diff)))
+          (if (slug diff) (setf (slug p) (slug diff)))
+          (if (area-of-focus diff) (setf (area-of-focus p) (area-of-focus diff))) (if (tags diff) (setf (tags p) (union (tags p) (tags diff) :test #'string=)))
+          (if (inherit-tags diff) (setf (inherit-tags p) (union (inherit-tags p) (inherit-tags diff) :test #'string=)))
+          (if remove-tags (setf (tags p) (set-difference (tags p) remove-tags :test #'string=)))
+          (if remove-inherit-tags (setf (inherit-tags p) (set-difference (inherit-tags p) remove-inherit-tags :test #'string=)))
+          p) projects)))
 
 ;; TODO Replace ascii-table with custom `format' calls so that I can control
 ;; the layout better. The current layout is far too bulky.
@@ -212,3 +171,37 @@ Typically called with ~/.projects/active.json as the `filename'"
     (dolist (project project-list)
       (ascii-table:add-row table (list (id project) (description project) (area-of-focus project) (tags project) (slug project))))
     (ascii-table:display table)))
+
+(defun project-from-list (input-data)
+  "Creates a project from `input-data' By consolidating all my filtering here, I can make the code
+easier to maintain.
+
+Paramters:
+`input-data': A list of strings.
+
+Returns:
+`proj': A project object containing all the variables set by the input string.
+`input-remove-tags': A list of tags set to be removed. This is discarded when creating a project, but used for filtering and modifying projects.
+`input-remove-inherit-tags': Same as `input-remove-tags', but for `inherit-tags'.
+`input-source': The string identifying which list to look on when filtering."
+  (let (input-id input-description input-uuid input-slug input-area input-source input-tags input-inherit-tags input-remove-tags input-remove-inherit-tags proj)
+    (dolist (term input-data)
+      (cond
+        ((search "area:" term) (setf input-area (subseq term 5)))
+        ((search "++" term) (push (subseq term 2) input-inherit-tags))
+        ((search "+" term) (push (subseq term 1) input-tags))
+        ((search "uuid:" term) (setf input-uuid (subseq term 5)))
+        ((search "slug:" term) (setf input-slug (subseq term 5)))
+        ((search "id:" term) (setf input-id (parse-integer (subseq term 3) :junk-allowed t)))
+        ((search "--" term) (push (subseq term 2) input-remove-inherit-tags))
+        ((search "-" term) (push (subseq term 1) input-remove-tags))
+        ((search "source:" term) (setf input-source (subseq term 7)))
+        (t (add-to-end input-description term))))
+    (setf proj (make-project  :uuid input-uuid
+                              :area-of-focus input-area
+                              :tags input-tags
+                              :inherit-tags input-inherit-tags
+                              :slug input-slug
+                              :id input-id
+                              :description input-description))
+    (values proj input-remove-tags input-remove-inherit-tags input-source)))
