@@ -133,9 +133,6 @@ the project(s) being modified."
     ((string= (car input) "professional") (professional-tickler))
     (t (weekly-review))))
 
-;; TODO Rewrite this to create filters rather than apply filters. Then use `search-projects'
-;; and `update-projects' to do the actual filtering
-
 (defun filter-projects (filter)
   (multiple-value-bind (filt block-tags block-inherit-tags source) (project-from-list filter)
     (cond
