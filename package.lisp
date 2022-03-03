@@ -11,7 +11,3 @@
            #:get-list-from-file))
 
 (in-package #:projectwarrior)
-
-(defvar *active-projects-list* nil)
-(defvar *completed-projects-list* nil)
-(defvar *deleted-projects-list* nil)

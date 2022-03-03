@@ -1,7 +1,6 @@
 ;;;; task.lisp
 
-;;; This file holds the internal representation of a task imported from
-;;; taskwarrior.
+;;; This file holds the internal representation of a task imported from taskwarrior.
 
 (in-package :projectwarrior)
 

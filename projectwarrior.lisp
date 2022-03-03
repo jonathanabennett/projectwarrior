@@ -1,21 +1,7 @@
 ;;;; projectwarrior.lisp
 
-;;; This program walked a user through a review of their projects.
-;;; Projects are pulled from the task management program `taskwarrior`.
-;;; Each project is presented, one by one, and the user is asked to classify
-;;; the project as either (a)ctive, (c)ompleted, or (d)eleted.
-;;;
-;;; Active projects are entered into the projects list for the next review.
-;;; Completed and deleted projects are removed from the projects list.
-;;;
-;;; Future versions will do something different with completed and deleted
-;;; projects, but for now the two behave identically.
-;;;
-;;; Greet user
-;;; Sync projects list
-;;; Display project
-;;; Sort project (keep or delete)
-;;; When finished, say goodbye.
+;;; This program allows a user to track projects in the same way that taskwarrior allows you to
+;;; track tasks.
 
 
 (in-package #:projectwarrior)
@@ -23,6 +9,7 @@
 (defvar *valid-commands* '("add" "done" "delete" "del" "modify" "mod" "view" "review" "help"))
 
 (defun add-from-string (project-data)
+  "This is used when adding from a string rather than a list."
   (add (cl-utilities:split-sequence " " project-data :test #'string=))
   (save-projects *active-projects-list* *active-projects-filepath*))
 
@@ -48,8 +35,6 @@
   (save-projects *active-projects-list* *active-projects-filepath*)
   (save-projects *deleted-projects-list* *deleted-projects-filepath*))
 
-;; TODO Rewrite this to use the new `PROJECT' class
-;; Look up tasks using the `slug' field on the `PROJECT' object.
 (defun projects-review ()
   "This guides a user through a review of the projects listed in `*active-projects-list*' file."
   (format t "Welcome to your project review.")
@@ -65,7 +50,7 @@
                  ((equal response "c") (push project completed-projects))
                  ((equal response "d") (push project deleted-projects))
                  (t (push project active-projects)
-                    (add-until-enter (format nil "project:~a ~{+~a ~} " (slug project) (tags project)))))))
+                    (add-until-enter (format nil "project:~a ~{+~a ~} " (slug project) (inherit-tags project)))))))
     (complete-projects completed-projects)
     (delete-projects deleted-projects)))
 
@@ -83,14 +68,16 @@
 (defun main (&rest argv)
   "This is the script entry point."
   (declare (ignore argv))
-  (setf *active-projects-list* (load-projects *active-projects-filepath* ))
-  (setf *completed-projects-list* (load-projects *completed-projects-filepath* ))
-  (setf *deleted-projects-list* (load-projects *deleted-projects-filepath* ))
   ;; Add code here to read in ~/.projectwarrior/config.lisp
   ;; If the file doesn't exist, create a default one from the template.
   ;; Primary initial contents will be the review options
   ;; Which will get registered as keyword options after review.
+  (setf *active-projects-list* (load-projects *active-projects-filepath* ))
+  (setf *completed-projects-list* (load-projects *completed-projects-filepath* ))
+  (setf *deleted-projects-list* (load-projects *deleted-projects-filepath* ))
+
   (command-dispatcher (uiop/image:command-line-arguments))
+
   (save-projects *active-projects-list* *active-projects-filepath*)
   (save-projects *completed-projects-list* *completed-projects-filepath*)
   (save-projects *deleted-projects-list* *deleted-projects-filepath*)

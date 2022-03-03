@@ -92,8 +92,7 @@ slug: description"
     (format out "~a: ~a" (slug p) (description p))))
 
 (defun save-projects (project-list filename)
-  "Save the `project-list' to file.
-Typically called with ~/.projects/active.json as the `filename'"
+"Save the `project-list' to file."
   (with-open-file (out filename
                        :direction :output
                        :if-exists :supersede)
@@ -113,6 +112,7 @@ Typically called with ~/.projects/active.json as the `filename'"
     (format out "~%")))
 
 (defun load-projects (filename)
+  "Load `projects' list from `filename'."
   (with-open-file (in filename :if-does-not-exist :create :direction :input)
     (let  ((data
              (if (listen in)
@@ -125,6 +125,7 @@ Typically called with ~/.projects/active.json as the `filename'"
       output)))
 
 (defun json->project (json-data id)
+  "Turn valid `json-data' into a project"
   (if (cdr (assoc :id json-data))
       (setf id (cdr (assoc :id json-data))))
   (make-project :uuid (cdr (assoc :uuid json-data))
@@ -136,7 +137,7 @@ Typically called with ~/.projects/active.json as the `filename'"
                 :inherit-tags (cdr (assoc :inherit-tags json-data))))
 
 (defun where (comp)
-  "Takes a project and matches other projects which match that project"
+  "Take project `comp' and match other projects which match that project"
   #'(lambda (project)
       (and
        (if (area-of-focus comp) (search (area-of-focus comp) (area-of-focus project)) t)
@@ -147,10 +148,11 @@ Typically called with ~/.projects/active.json as the `filename'"
        (if (description comp)   (search (description comp) (description project)) t))))
 
 (defun search-projects (search-fn project-list)
+  "Search a project list using `where'."
   (remove-if-not search-fn project-list))
 
-;; TODO Refactor as a macro to make it easier to add new fields.
 (defun update-projects (projects modifications)
+  "For each `p' in `projects', change it by `modifications'."
   (multiple-value-bind (diff remove-tags remove-inherit-tags) (project-from-list modifications)
     (mapcar
       #'(lambda (p)
