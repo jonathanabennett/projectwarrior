@@ -205,5 +205,5 @@ Returns:
                               :inherit-tags input-inherit-tags
                               :slug input-slug
                               :id input-id
-                              :description input-description))
+                              :description (format nil "~{~A~^ ~}" input-description)))
     (values proj input-remove-tags input-remove-inherit-tags input-source)))

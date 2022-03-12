@@ -15,7 +15,7 @@
 
 (defun add (project-data)
   "This adds a new project to the active.json project list after parsing the string into appropriate variables."
-  (add-to-end *active-project-list* (project-from-list (project-data))))
+  (add-to-end *active-projects-list* (project-from-list project-data)))
 
 (defun complete-project (project-num)
   "Find project `project-num' in the `*active-projects-list*', remove it, and append it to the
