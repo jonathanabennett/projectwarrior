@@ -1,7 +1,7 @@
 ;;;; package.lisp
 
 (defpackage :projectwarrior
-  (:use #:cl)
+  (:use #:cl #:cl-ansi-text)
   (:export #:main
            #:merge-lists
            #:ask
