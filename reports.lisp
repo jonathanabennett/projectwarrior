@@ -2,6 +2,12 @@
 ;;;
 ;;; Generates reports for display to the user.
 
+(defstruct report-layout
+  name
+  column-labels
+  column-functions
+  column-align)
+
 (in-package :projectwarrior)
 
 (defconstant +cell-formats+ '(:left   "~vA"
@@ -12,8 +18,8 @@
   (loop for col in columns
         collect (format nil "~A" (funcall col p))))
 
-(defun format-table (projects stream &key (column-label '("Slug" "Description" "Area of Focus" "tags"))
-                                   (column-function '(slug description area-of-focus tags))
+(defun format-table (projects stream &key (column-label '("#" "Slug" "Description" "Area of Focus" "tags"))
+                                   (column-function '(id slug description area-of-focus tags))
                                    (column-align (loop for i from 1 to (length column-label)
                                                        collect :left)))
   "Code adapted from https://gist.github.com/WetHat/a49e6f2140b401a190d45d31e052af8f"
@@ -43,5 +49,9 @@
                            (loop for align in column-align
                                  collect (getf +CELL-FORMATS+ align))))
           (widths (loop for w across col-widths collect w)))
-      (dolist (row strtable)
-        (apply #'format stream row-fmt (mapcan #'list widths row))))))
+      (loop for row-num from -1 to (length strtable)
+            for row in strtable
+            do (cond
+                 ((< row-num 1) (apply #'format stream row-fmt (mapcan #'list widths row)))
+                 ((= (mod row-num 2) 1) (with-color (:green :stream stream) (apply #'format stream row-fmt (mapcan #'list widths row))))
+                 ((= (mod row-num 2) 0) (with-color (:blue :stream stream) (apply #'format stream row-fmt (mapcan #'list widths row)))))))))

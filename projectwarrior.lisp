@@ -102,13 +102,13 @@ the project(s) being modified."
               (add-to-end filter term))))
     (cond
           ((string= command "add") (add modifications))
-          ((string= command "view") (list-projects (filter-projects filter)))
+          ((string= command "view") (format-table (filter-projects filter) t))
           ((string= command "mod") (update-projects (filter-projects filter) modifications))
           ((string= command "done") (complete-projects (filter-projects filter)))
           ((string= command "delete") (delete-projects (filter-projects filter)))
           ((string= command "review") (review-dispatcher modifications))
           ((string= command "help") (help))
-          (t (list-projects (filter-projects filter))))))
+          (t (format-table (filter-projects filter) t)))))
 
 (defun review-dispatcher (input)
   "Select the review to conduct based on user input. In the case there is no input, give them the

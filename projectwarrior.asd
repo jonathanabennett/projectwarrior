@@ -6,13 +6,14 @@
   :license "MIT"
   :version "0.2.0"
   :serial t
-  :depends-on ("yason" "cl-ascii-table" "cl-ansi-text" "uuid" "cl-slug" "cl-json" "cl-utilities")
+  :depends-on ("yason" "cl-ansi-text" "uuid" "cl-slug" "cl-json" "cl-utilities")
   :components
   ((:file "package")
    (:file "config" :depends-on ("package"))
    (:file "utils" :depends-on ("package" "config"))
    (:file "task" :depends-on ("package" "config" "utils"))
    (:file "project" :depends-on ("package" "config" "utils"))
+   (:file "reports" :depends-on ("project" "config" "utils"))
    (:file "review" :depends-on ("package" "config" "utils"))
    (:file "projectwarrior" :depends-on ("package" "config" "utils" "project" "review")))
   :build-operation :program-op
