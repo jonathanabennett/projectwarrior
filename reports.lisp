@@ -2,13 +2,27 @@
 ;;;
 ;;; Generates reports for display to the user.
 
-(defstruct report-layout
+(in-package :projectwarrior)
+
+(defstruct report
   name
   column-labels
   column-functions
   column-align)
 
-(in-package :projectwarrior)
+(defvar *reports-list* '())
+
+(defun register-report (&key name col-labels col-functions col-align)
+  (push (make-report :name name
+                     :column-labels col-labels
+                     :column-functions col-functions
+                     :column-align col-align)
+        *reports-list*))
+
+(defvar *default-report* (make-report :name "Default"
+                                      :column-labels '("#" "Slug" "Description" "Area of Focus" "tags")
+                                      :column-functions '(id slug description area-of-focus tags)
+                                      :column-align (loop for i from 1 to 5 collect :left)))
 
 (defconstant +cell-formats+ '(:left   "~vA"
                               :center "~v:@<~A~>"
@@ -18,15 +32,12 @@
   (loop for col in columns
         collect (format nil "~A" (funcall col p))))
 
-(defun format-table (projects stream &key (column-label '("#" "Slug" "Description" "Area of Focus" "tags"))
-                                   (column-function '(id slug description area-of-focus tags))
-                                   (column-align (loop for i from 1 to (length column-label)
-                                                       collect :left)))
+(defun format-table (projects stream &key (report-format *default-report*))
   "Code adapted from https://gist.github.com/WetHat/a49e6f2140b401a190d45d31e052af8f"
-  (let* ((col-count (length column-label))
-         (strtable  (cons column-label ; CAR of string table is the table header as a list of strings
+  (let* ((col-count (length (report-column-labels report-format)))
+         (strtable  (cons (report-column-labels report-format) ; CAR of string table is the table header as a list of strings
                           (loop for project in projects
-                                collect (report-formatter project column-function))))
+                                collect (report-formatter project (report-column-functions report-format)))))
          (col-widths (loop with widths = (make-array col-count :initial-element 0)
                            for row in strtable
                            do (loop for cell in row
@@ -37,7 +48,7 @@
         ; Splice in the header separator
     (setq strtable
           (nconc (list (car strtable)
-                       (loop for align in column-align
+                       (loop for align in (report-column-align report-format)
                              for width across col-widths
                            collect (case align
                                      (:left   (format nil ":~v@{~A~:*~}" (1- width) "-"))
@@ -46,7 +57,7 @@
                        (cdr strtable)))
         ; Generate the formatted table
     (let ((row-fmt (format nil "| ~{~A~^ | ~} |~~%"
-                           (loop for align in column-align
+                           (loop for align in (report-column-align report-format)
                                  collect (getf +CELL-FORMATS+ align))))
           (widths (loop for w across col-widths collect w)))
       (loop for row-num from -1 to (length strtable)

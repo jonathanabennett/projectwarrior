@@ -6,7 +6,7 @@
 
 (in-package #:projectwarrior)
 
-(defvar *valid-commands* '("add" "done" "delete" "del" "modify" "mod" "view" "review" "help"))
+(defvar *valid-commands* '("add" "done" "delete" "del" "modify" "mod" "review" "help"))
 
 (defun add-from-string (project-data)
   "This is used when adding from a string rather than a list."
@@ -72,10 +72,13 @@
   ;; If the file doesn't exist, create a default one from the template.
   ;; Primary initial contents will be the review options
   ;; Which will get registered as keyword options after review.
+  (check-for-configuration-file)
+
   (setf *active-projects-list* (load-projects *active-projects-filepath* ))
   (setf *completed-projects-list* (load-projects *completed-projects-filepath* ))
   (setf *deleted-projects-list* (load-projects *deleted-projects-filepath* ))
 
+  (setq *valid-commands* (union *valid-commands* (mapcar #'report-name *reports-list*) :test #'string=))
   (command-dispatcher (uiop/image:command-line-arguments))
 
   (save-projects *active-projects-list* *active-projects-filepath*)
@@ -102,11 +105,15 @@ the project(s) being modified."
               (add-to-end filter term))))
     (cond
           ((string= command "add") (add modifications))
-          ((string= command "view") (format-table (filter-projects filter) t))
           ((string= command "mod") (update-projects (filter-projects filter) modifications))
           ((string= command "done") (complete-projects (filter-projects filter)))
           ((string= command "delete") (delete-projects (filter-projects filter)))
           ((string= command "review") (review-dispatcher modifications))
+          ((string= command "view") (format-table (filter-projects filter) t))
+          ((member command *reports-list* :test #'string= :key #'(lambda (x) (report-name x)))
+           (format-table (filter-projects filter) t
+                         :report-format (car (member command *reports-list* :test #'string=
+                                                    :key #'(lambda (x) (report-name x))))))
           ((string= command "help") (help))
           (t (format-table (filter-projects filter) t)))))
 
