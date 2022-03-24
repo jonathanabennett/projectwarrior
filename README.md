@@ -1,10 +1,10 @@
 # Projectwarrior
 
-**0.3.0 BREAKING CHANGE:** Because I am not sure exactly how to add a project from just the slug present in taskwarrior, the task-hook is currently depreciated. Leaving it running will not break anything (It targets a different file), but it won't add anything to projectwarrior either.
+**0.3.0 BREAKING CHANGE:** Because I am not sure exactly how to add a project from just the slug present in taskwarrior, the task-hook is currently depreciated. Leaving it running will not overwrite anything (It targets a different file), but any projects that it pulls from taskwarrior won't get added to projectwarrior.
 
 ### _Jonathan A. Bennett <doulos05@gmail.com>_
 
-This is a suite of tools to guide a user through a thorough weekly review using Taskwarrior to store active tasks.
+This is a simple command line project management tool. Users can enter the projects along with metadata about the projects and track them through to completion. It integrates with taskwarrior for tracking the tasks within those projects, but could be integrated manually with another tool if you wanted.
 
 ## License
 
@@ -65,6 +65,8 @@ Example calls:
 
 `project <filter> done` moves all projects which match `<filter>` from the `~/.projects/active.json` file to the `~/.projects/completed.json` file.
 
+If there are more than 3 projects which will be affected, you will be prompted for each one.
+
 Example Calls
 
 `project 14 done`
@@ -76,6 +78,8 @@ Example Calls
 `project <filter> delete` moves all projects which match `<filter>` from the `~/.projects/active.json` file to the `~/.projects/deleted.json` file.
 
 `project <filter> del` is identical to `project <filter> delete`
+
+If there are more than 3 projects which will be affected, you will be prompted for each one.
 
 Example Calls:
 
@@ -101,7 +105,13 @@ Examples Calls:
 
 This is one of the main reasons I built this program. `project review <checklist>` guides you through the `<checklist>` review checklist, ensuring at the end that you have gone through a thorough review of all the stuff in your life and categorized it appropriately. Each checklist (except `projects`, describe below) works by presenting you with a series of prompts. In response to each prompt, you can type a project in to add it to projectwarror (following the format described for the `add` command). Once you hit enter without typing anything in, you can do the same with tasks to add to taskwarrior. Simply enter what you would enter after the command `task add`. So to add the task "Get Milk +@errands priority:H" to your tasks, you would enter `Get Milk +@errands priority:H`. That exact string will be passed to Taskwarrior. You will see on the screen the command that is being run.
 
-Right now, the weekly review can only be customized by editing the `review.lisp` file and re-running `make build && make install`. Future versions will allow you to define your own reviews (removing unnecessary prompts or creating custom reviews like a shortened "daily" review). The full review is a full, GTD style weekly review. Expect it to take a full hour if you are a reasonably broadly committed person. Pausing a review and resuming where you left off is not currently supported.
+Right now, the weekly review can only be customized by editing the `review.lisp` file and re-running `make build && make install`. Future versions will allow you to define your own reviews (removing unnecessary prompts or creating custom reviews like a shortened "daily" review). The full review is a full, GTD style weekly review. Expect it to take a full hour if you have a lot of personal and professional commitments. Pausing a review and resuming where you left off is not currently supported, but the full review can be taken in 3 pieces like so:
+
+1. `project review professional`
+2. `project review personal`
+3. `project review projects`
+
+Doing it this way only skips the reminder to check your calendar and your someday/maybe list, and to "get creative" at the end of your review time.
 
 The currently supported review are
 
@@ -112,13 +122,13 @@ The currently supported review are
 
 ### Projects Review
 
-Run `project review projects` to trigger a review of your projects. This review also occurs at the end of your weekly review. When this is called, the projects in your `~/.projects/active.json` file will be displayed one by one and the taskwarrior command `task project.is:<project slug> and (status:PENDING or status:WAITING) all` will be called. This gives you a list of pending and waiting tasks for this project. Review this list and evaluate the project for yourself. Do the tasks currently captured in taskwarrior represent everything you need to do with this project? Are any of these tasks stale? If you need to add a task, you will be prompted to add a task using the project slug and the inherited tags from that projet. If you need to modify or complete any existing tasks, use a _separate_ terminal window, to run the appropriate taskwarrior commands. Projectwarrior will **NEVER** remove something from your tasks list for you, this is an additive process only. Finally, mark the project as:
+Run `project review projects` to trigger a review of your projects. This review also occurs at the end of your weekly review. When this is called, the projects in your `~/.projects/active.json` file will be displayed one by one and the taskwarrior command `task project.is:<project slug> and (status:PENDING or status:WAITING) all` will be called. This gives you a list of pending and waiting tasks for this project. Review this list and evaluate the project for yourself. Do the tasks currently captured in taskwarrior represent everything you need to do with this project? Are any of these tasks stale? If you need to add a task, you will be prompted to add a task using the project slug and the inherited tags from that project. If you need to modify or complete any existing tasks, use a _separate_ terminal window, to run the appropriate taskwarrior commands. Projectwarrior will **NEVER** remove something from your tasks list for you, this is an additive process only. Finally, mark the project as:
 
 - [a]ctive: This project is still part of my productivity landscape and should remain `active.json`.
 - [c]ompleted: This project is complete and should be moved to `completed.json`.
 - [d]eleted: This project is no longer relevant and should be moved to `deleted.json`.
 
-**NOTE** This project does not mark tasks done or deleted in taskwarrior for you. If you mark a project completed or deleted, you must make the matching edits to your taskwarrior tasks.
+**NOTE** This does not mark tasks done or deleted in taskwarrior for you. If you mark a project completed or deleted, you must make the matching edits to your taskwarrior tasks.
 
 ### The Hook CURRENTLY DEPRECIATED
 
@@ -136,7 +146,7 @@ This app exists to make reviewing your tasks easier. "But what about `tasksh rev
 
 `tasksh review` focuses on tasks because taskwarrior's level of abstraction is the task. This is completely appropriate and should not be changed. While _doing_, "task" is the ideal level of abstraction. We may say that we're "working on our final reports", but what we're actually _doing_ is "writing the first draft" or "reviewing the data from the reporting period". And so a tool intended for use while doing must optimize for that abstraction level. But the task is too granular to be a useful level of abstraction for _reviewing_. For that, you need to step up to the project level.
 
-The purpose of this program is to use taskwarrior to track and complete your tasks (where the level of abstraction is optimized for doing) and use projectwarrior to review and manage your projects (where the level of abstraction is optimized for reviewing).
+The purpose of this program is to use taskwarrior (or other todo managers) to track and complete your tasks (where the level of abstraction is optimized for doing) and use projectwarrior to review and manage your projects (where the level of abstraction is optimized for reviewing).
 
 ## Roadmap
 
@@ -151,10 +161,10 @@ The purpose of this program is to use taskwarrior to track and complete your tas
 - Allow user configuration and create a default config.
 - Change the `view` display to make it easier to read and more compact.
 - Allow some customization by users of the `view` display
-- Create a `project open` command which opens a file containing project support information. Write the initial connectors using `org-roam-protocol`, `org-protocol` and a simple `notes` folder.
 
 ### 0.3.2 Expanded Reviews
 
+- Create a `project open` command which opens a file containing project support information. Write the initial connectors using `org-roam-protocol`, `org-protocol` and a simple `notes` folder.
 - Pull reviews out of the "compiled" portion of the program so that they are user-configurable.
 - Allow the users to create and register their own reviews using their config file.
 

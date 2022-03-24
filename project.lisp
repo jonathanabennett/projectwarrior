@@ -165,15 +165,6 @@ slug: description"
           (if remove-inherit-tags (setf (inherit-tags p) (set-difference (inherit-tags p) remove-inherit-tags :test #'string=)))
           p) projects)))
 
-;; TODO Replace ascii-table with custom `format' calls so that I can control
-;; the layout better. The current layout is far too bulky.
-(defun list-projects (project-list)
-  "This function builds an ascii-table table of the projects."
-  (let ((table (ascii-table:make-table `("#" "Description" "Area of Focus" "Tags" "Slug") :header "Projects Report")))
-    (dolist (project project-list)
-      (ascii-table:add-row table (list (id project) (description project) (area-of-focus project) (tags project) (slug project))))
-    (ascii-table:display table)))
-
 (defun project-from-list (input-data)
   "Creates a project from `input-data' By consolidating all my filtering here, I can make the code
 easier to maintain.
