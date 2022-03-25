@@ -72,11 +72,11 @@
   ;; If the file doesn't exist, create a default one from the template.
   ;; Primary initial contents will be the review options
   ;; Which will get registered as keyword options after review.
-  (check-for-configuration-file)
+  (load-configuration)
 
-  (setf *active-projects-list* (load-projects *active-projects-filepath* ))
-  (setf *completed-projects-list* (load-projects *completed-projects-filepath* ))
-  (setf *deleted-projects-list* (load-projects *deleted-projects-filepath* ))
+  (setf *active-projects-list* (load-projects *active-projects-filepath*))
+  (setf *completed-projects-list* (load-projects *completed-projects-filepath*))
+  (setf *deleted-projects-list* (load-projects *deleted-projects-filepath*))
 
   (setq *valid-commands* (union *valid-commands* (mapcar #'report-name *reports-list*) :test #'string=))
   (command-dispatcher (uiop/image:command-line-arguments))

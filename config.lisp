@@ -30,6 +30,9 @@ default configuration in ~/.projectrc.lisp"
 the default configuration options into the file at ~/.projectrc.lisp"
     (uiop:copy-file (uiop:native-namestring "./default_config.lisp") (uiop:native-namestring "~/.projectrc.lisp")))
 
+(defvar *active-projects-filepath*)
+(defvar *completed-projects-filepath*)
+(defvar *deleted-projects-filepath*)
 (defvar *active-projects-list* nil)
 (defvar *completed-projects-list* nil)
 (defvar *deleted-projects-list* nil)
@@ -38,13 +41,12 @@ the default configuration options into the file at ~/.projectrc.lisp"
 (defvar *data-folder* (uiop:native-namestring "~/.projects/") "Folder where data is stored.")
 (defvar *enable-taskwarrior-integration* nil)
 
-;; Check for user config
-(check-for-configuration-file)
-
 ;; General
-(defvar *active-projects-filepath* (uiop:native-namestring
-                             (concatenate 'string *data-folder* "active.json")))
-(defvar *completed-projects-filepath* (uiop:native-namestring
-                             (concatenate 'string *data-folder* "completed.json")))
-(defvar *deleted-projects-filepath* (uiop:native-namestring
-                             (concatenate 'string *data-folder* "deleted.json")))
+(defun load-configuration ()
+  (check-for-configuration-file)
+  (setf *active-projects-filepath* (uiop:native-namestring
+                                    (concatenate 'string *data-folder* "active.json")))
+  (setf *completed-projects-filepath* (uiop:native-namestring
+                                       (concatenate 'string *data-folder* "completed.json")))
+  (setf *deleted-projects-filepath* (uiop:native-namestring
+                                     (concatenate 'string *data-folder* "deleted.json"))))
