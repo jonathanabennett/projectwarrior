@@ -44,7 +44,7 @@
     (loop for project in *active-projects-list*
           for i from 1
           do (format t "~%~%~%~%Project: ~A~%" (description project))
-             (list-tasks (slug project))
+             (uiop:run-program (format nil "task project.is:~A and '(status:PENDING or status:WAITING)' rc.hooks=off" (slug project)) :ignore-error-status t :output t)
              (let ((response (ask-until-valid '("a" "c" "d") "Is this project [a]ctive, [c]ompleted, or [d]eleted? ")))
                (cond
                  ((equal response "c") (push project completed-projects))
