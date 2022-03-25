@@ -6,7 +6,7 @@
   :license "MIT"
   :version "0.3.1"
   :serial t
-  :depends-on ("yason" "cl-ascii-table" "cl-ansi-text" "uuid" "cl-slug" "cl-json" "cl-utilities")
+  :depends-on ("cl-ascii-table" "cl-ansi-text" "uuid" "cl-slug" "cl-json" "cl-utilities")
   :components
   ((:file "package")
    (:file "utils" :depends-on ("package"))
