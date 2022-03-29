@@ -11,7 +11,7 @@
 ;; TODO Restructure this so it adds projects AND Tasks
 (in-package #:projectwarrior)
 
-(defmacro make-review (review-prompts &key projectsp tasksp projects-context tasks-context)
+(defun make-review (review-prompts &key projectsp tasksp projects-context tasks-context)
   "Generates the reviews below from a shorter format that should be easier for non-lispers"
   )
 

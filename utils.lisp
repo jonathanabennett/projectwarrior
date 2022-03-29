@@ -33,11 +33,11 @@
         with response = nil
         while (null response)
         if (member answer valid-response-list :test 'equal)
-          do (setq response answer)
+          do (setf response answer)
         else do (clear-input)
                 (write-string prompt)
                 (finish-output)
-                (setq answer (read-line))
+                (setf answer (read-line))
         finally (return answer)))
 
 (defun add-taskwarrior (user-string context)
@@ -56,9 +56,9 @@ hits enter on an empty line. This relies on the changes being saved at the end b
         do (format t "Add a project to projectwarrior.~%")
            (write-string "Enter the task project here or hit enter to continue without adding a project:")
            (finish-output)
-           (setq user-input (read-line))
+           (setf user-input (read-line))
         if (equal user-input "")
-          do (setq leave t)
+          do (setf leave t)
         else do (clear-input)
                 (add-from-string user-input)
                 (terpri)))
@@ -71,11 +71,11 @@ hits enter on an empty line. This relies on the changes being saved at the end b
         do (format t "Add a task to taskwarrior using the following context: ~A~%" context)
            (write-string "Enter the task here or hit enter to continue without adding a task: ")
            (finish-output)
-           (setq user-input (read-line))
+           (setf user-input (read-line))
         if (equal user-input "")
-          do (setq leave t)
+          do (setf leave t)
         else do (clear-input)
-                (setq task-string (format nil "task add ~A ~A~%" context user-input))
+                (setf task-string (format nil "task add ~A ~A~%" context user-input))
                 (write-string "This will execute the following command:")
                 (terpri)
                 (write-string task-string)
@@ -83,7 +83,7 @@ hits enter on an empty line. This relies on the changes being saved at the end b
 
 (defmacro add-to-end (target item)
   "This macro cleans up calls to append to the end of lists, something I need to do a lot in this codebase."
-  `(setq ,target (append ,target (list ,item))))
+  `(setf ,target (append ,target (list ,item))))
 
 ;; Date work
 (defun date-as-list (universal-timestamp)

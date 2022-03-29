@@ -78,7 +78,7 @@
   (setf *completed-projects-list* (load-projects *completed-projects-filepath*))
   (setf *deleted-projects-list* (load-projects *deleted-projects-filepath*))
 
-  (setq *valid-commands* (union *valid-commands* (mapcar #'report-name *reports-list*) :test #'string=))
+  (setf *valid-commands* (union *valid-commands* (mapcar #'report-name *reports-list*) :test #'string=))
   (command-dispatcher (uiop/image:command-line-arguments))
 
   (save-projects *active-projects-list* *active-projects-filepath*)
@@ -101,7 +101,7 @@ the project(s) being modified."
       (if command
           (add-to-end modifications term)
           (if (member term *valid-commands* :test #'string=)
-              (setq command term)
+              (setf command term)
               (add-to-end filter term))))
     (cond
           ((string= command "add") (add modifications))

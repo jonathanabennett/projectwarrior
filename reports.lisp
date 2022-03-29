@@ -46,7 +46,7 @@
                                              (max (aref widths i) (length cell))))
                            finally (return widths))))
         ; Splice in the header separator
-    (setq strtable
+    (setf strtable
           (nconc (list (car strtable)
                        (loop for align in (report-column-align report-format)
                              for width across col-widths
