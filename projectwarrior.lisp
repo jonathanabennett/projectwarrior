@@ -47,12 +47,10 @@
              (uiop:run-program (format nil "task project.is:~A and '(status:PENDING or status:WAITING)' rc.hooks=off" (slug project)) :ignore-error-status t :output t)
              (let ((response (ask-until-valid '("a" "c" "d") "Is this project [a]ctive, [c]ompleted, or [d]eleted? ")))
                (cond
-                 ((equal response "c") (push project completed-projects))
-                 ((equal response "d") (push project deleted-projects))
+                 ((equal response "c") (complete-project (id project)))
+                 ((equal response "d") (delete-project (id project)))
                  (t (push project active-projects)
-                    (add-until-enter (format nil "project:~a ~{+~a ~} " (slug project) (inherit-tags project)))))))
-    (complete-projects completed-projects)
-    (delete-projects deleted-projects)))
+                    (add-until-enter (format nil "project:~a ~{+~a ~} " (slug project) (inherit-tags project)))))))))
 
 (defun help ()
   "Print out the help."
