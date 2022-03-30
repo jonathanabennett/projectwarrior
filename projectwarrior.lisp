@@ -17,19 +17,19 @@
   "This adds a new project to the active.json project list after parsing the string into appropriate variables."
   (add-to-end *active-projects-list* (project-from-list project-data)))
 
-(defun complete-project (project-num)
-  "Find project `project-num' in the `*active-projects-list*', remove it, and append it to the
+(defun complete-project (project-uuid)
+  "Find project `project-uuid' in the `*active-projects-list*', remove it, and append it to the
 `*completed-projects-list*'. Then save both project lists to file."
-  (let ((project (nth (- project-num 1) *active-projects-list*)))
+  (let ((project (find project-uuid *active-projects-list* :key #'uuid :test #'uuid:uuid=)))
     (setq *active-projects-list* (remove project *active-projects-list*))
     (add-to-end *completed-projects-list* project))
   (save-projects *active-projects-list* *active-projects-filepath*)
   (save-projects *completed-projects-list* *completed-projects-filepath*))
 
-(defun delete-project (project-num)
-  "Find project `project-num' in the `*active-projects-list*', remove it, and append it to the
+(defun delete-project (project-uuid)
+  "Find project `project-uuid' in the `*active-projects-list*', remove it, and append it to the
 `*deleted-projects-list*'. Then save both project lists to file."
-  (let ((project (nth (- project-num 1) *active-projects-list*)))
+  (let ((project (find project-uuid *active-projects-list* :key #'uuid :test #'uuid:uuid=)))
     (setq *active-projects-list* (remove project *active-projects-list*))
     (add-to-end *completed-projects-list* project))
   (save-projects *active-projects-list* *active-projects-filepath*)
@@ -47,8 +47,8 @@
              (uiop:run-program (format nil "task project.is:~A and '(status:PENDING or status:WAITING)' rc.hooks=off" (slug project)) :ignore-error-status t :output t)
              (let ((response (ask-until-valid '("a" "c" "d") "Is this project [a]ctive, [c]ompleted, or [d]eleted? ")))
                (cond
-                 ((equal response "c") (complete-project (id project)))
-                 ((equal response "d") (delete-project (id project)))
+                 ((equal response "c") (complete-project (uuid project)))
+                 ((equal response "d") (delete-project (uuid project)))
                  (t (push project active-projects)
                     (add-until-enter (format nil "project:~a ~{+~a ~} " (slug project) (inherit-tags project)))))))))
 
@@ -142,7 +142,7 @@ completion."
       (if prompt
           (setf completep (yes-or-no-p "Do you want to complete project ~a? " (description p))))
       (if completep
-          (complete-project (id p))))))
+          (complete-project (uuid p))))))
 
 (defun delete-projects (projects)
   "Delete all projects in `projects'. If `projects' is more than 3 itesm, prompt for each."
@@ -152,4 +152,4 @@ completion."
       (if prompt
           (setf deletep (yes-or-no-p "Do you want to delete project ~a ?" (description p))))
       (if deletep
-          (delete-project (id p))))))
+          (delete-project (uuid p))))))

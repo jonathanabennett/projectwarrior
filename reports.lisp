@@ -24,9 +24,11 @@
                                       :column-functions '(id slug description area-of-focus tags)
                                       :column-align (loop for i from 1 to 5 collect :left)))
 
-(defconstant +cell-formats+ '(:left   "~vA"
-                              :center "~v:@<~A~>"
-                              :right  "~v@A"))
+(alexandria:define-constant +cell-formats+ '(:left   "~vA"
+                                             :center "~v:@<~A~>"
+                                             :right  "~v@A")
+  :test #'equal
+  :documentation "These are the `FORMAT' recipes to align markdown tables left, right, and center.")
 
 (defmethod report-formatter ((p project) &optional (columns '(slug description area-of-focus tags inherit-tags)))
   (loop for col in columns

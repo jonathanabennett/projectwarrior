@@ -13,7 +13,6 @@
    (:file "project" :depends-on ("package" "utils"))
    (:file "reports" :depends-on ("project" "utils"))
    (:file "config" :depends-on ("package" "reports"))
-   (:file "task" :depends-on ("package" "config" "utils"))
    (:file "review" :depends-on ("package" "config" "utils"))
    (:file "projectwarrior" :depends-on ("package" "config" "utils" "project" "review")))
   :build-operation :program-op
