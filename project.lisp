@@ -19,6 +19,11 @@ Defaults to `-1' as a flag for the saving function to update the number.")
     :initarg :description
     :accessor description
     :documentation "A sentence description of a project.")
+   (filepath
+    :initarg :filepath
+    :accessor filepath
+    :initform nil
+    :documentation "The path to the file which the user has declared to be this project's support documentation.")
    (slug
     :initarg :slug
     :initform ""
@@ -63,7 +68,7 @@ Defaults to `-1' as a flag for the saving function to update the number.")
                  :slug name
                  :uuid (uuid::make-v5-uuid uuid::+namespace-dns+ name)))
 
-(defun make-project (&key uuid description slug tags inherit-tags area-of-focus id)
+(defun make-project (&key uuid description slug tags inherit-tags area-of-focus filepath id)
   "Used to create projects for my filtered lists. This does not add it to one of the master lists."
   (if (eq slug nil)
       (setf slug (cl-slug::slugify description)))
@@ -73,6 +78,7 @@ Defaults to `-1' as a flag for the saving function to update the number.")
   (make-instance 'project
                        :description description
                        :uuid uuid :slug slug :id id
+                       :filepath filepath
                        :area-of-focus area-of-focus
                        :tags tags :inherit-tags inherit-tags))
 
@@ -107,7 +113,8 @@ slug: description"
                    (cl-json:encode-object-member "description" (description p) out)
                    (cl-json:encode-object-member "areaOfFocus" (area-of-focus p) out)
                    (cl-json:encode-object-member "tags" (tags p) out)
-                   (cl-json:encode-object-member "inheritTags" (inherit-tags p) out)))
+                   (cl-json:encode-object-member "inheritTags" (inherit-tags p) out)
+                   (cl-json:encode-object-member "filepath" (filepath p) out)))
         (format out "~%")))
     (format out "~%")))
 
@@ -134,6 +141,7 @@ slug: description"
                 :slug (cdr (assoc :slug json-data))
                 :area-of-focus (cdr (assoc :AREA-OF-FOCUS json-data))
                 :tags (cdr (assoc :TAGS json-data))
+                :filepath (cdr (assoc :filepath json-data))
                 :inherit-tags (cdr (assoc :inherit-tags json-data))))
 
 (defun where (comp)
@@ -145,6 +153,7 @@ slug: description"
        (if (tags comp)          (member (tags comp) (tags project)) t)
        (if (inherit-tags comp)  (member (inherit-tags comp) (inherit-tags project)) t)
        (if (slug comp)          (search (slug comp) (slug project)) t)
+       (if (filepath comp)      (string= (filepath comp) (filepath project)) t)
        (if (description comp)   (search (description comp) (description project)) t))))
 
 (defun search-projects (search-fn project-list)
@@ -161,6 +170,7 @@ slug: description"
           (if (slug diff) (setf (slug p) (slug diff)))
           (if (area-of-focus diff) (setf (area-of-focus p) (area-of-focus diff))) (if (tags diff) (setf (tags p) (union (tags p) (tags diff) :test #'string=)))
           (if (inherit-tags diff) (setf (inherit-tags p) (union (inherit-tags p) (inherit-tags diff) :test #'string=)))
+          (if (filepath diff) (setf (filepath p) (filepath diff)))
           (if remove-tags (setf (tags p) (set-difference (tags p) remove-tags :test #'string=)))
           (if remove-inherit-tags (setf (inherit-tags p) (set-difference (inherit-tags p) remove-inherit-tags :test #'string=)))
           p) projects)))
@@ -177,7 +187,7 @@ Returns:
 `input-remove-tags': A list of tags set to be removed. This is discarded when creating a project, but used for filtering and modifying projects.
 `input-remove-inherit-tags': Same as `input-remove-tags', but for `inherit-tags'.
 `input-source': The string identifying which list to look on when filtering."
-  (let (input-id input-description input-uuid input-slug input-area input-source input-tags input-inherit-tags input-remove-tags input-remove-inherit-tags proj)
+  (let (input-id input-description input-uuid input-slug input-file input-area input-source input-tags input-inherit-tags input-remove-tags input-remove-inherit-tags proj)
     (dolist (term input-data)
       (cond
         ((search "area:" term) (setf input-area (subseq term 5)))
@@ -185,18 +195,23 @@ Returns:
         ((search "+" term) (push (subseq term 1) input-tags))
         ((search "uuid:" term) (setf input-uuid (subseq term 5)))
         ((search "slug:" term) (setf input-slug (subseq term 5)))
+        ((search "file:" term) (setf input-file (subseq term 5)))
         ((search "id:" term) (setf input-id (parse-integer (subseq term 3) :junk-allowed t)))
         ((search "--" term) (push (subseq term 2) input-remove-inherit-tags))
         ((search "-" term) (push (subseq term 1) input-remove-tags))
         ((search "source:" term) (setf input-source (subseq term 7)))
         (t (add-to-end input-description term))))
+    (if input-description
+        (setf input-description (format nil "~{~A~^ ~}" input-description))
+        (setf input-description nil))
     (setf proj (make-project  :uuid input-uuid
                               :area-of-focus input-area
                               :tags input-tags
                               :inherit-tags input-inherit-tags
+                              :filepath input-file
                               :slug input-slug
                               :id input-id
-                              :description (format nil "~{~A~^ ~}" input-description)))
+                              :description input-description))
     (values proj input-remove-tags input-remove-inherit-tags input-source)))
 
 (defun tasks (project)
@@ -211,3 +226,10 @@ Returns:
                                  (append (list (format nil "project:~a" (slug (car projects))))
                                          (loop for tag in (inherit-tags (car projects))
                                                collect (format nil "+~a" tag))))))))
+
+(defun open-supporting-documents (projects)
+  (if (cdr projects)
+      (write-string "Please select only one project to open.")
+      (if (filepath (car projects))
+          (uiop:run-program (format nil "~A ~A" (uiop:getenv "EDITOR") (filepath (car projects))))
+          (write-string "This project has no file associated with it. Please add one via 'project modify'."))))

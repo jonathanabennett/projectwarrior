@@ -6,7 +6,7 @@
 
 (in-package #:projectwarrior)
 
-(defvar *valid-commands* '("add" "done" "delete" "del" "modify" "mod" "review" "help" "tasks" "new"))
+(defvar *valid-commands* '("add" "done" "delete" "del" "modify" "mod" "review" "help" "tasks" "new" "open"))
 
 (defun add-from-string (project-data)
   "This is used when adding from a string rather than a list."
@@ -109,6 +109,7 @@ the project(s) being modified."
           ((string= command "new") (new (filter-projects filter) modifications))
           ((string= command "tasks") (tasks-reporter (filter-projects filter)))
           ((string= command "review") (review-dispatcher modifications))
+          ((string= command "open") (open-supporting-documents (filter-projects filter)))
           ((string= command "view") (format-table (filter-projects filter) t))
           ((member command *reports-list* :test #'string= :key #'(lambda (x) (report-name x)))
            (format-table (filter-projects filter) t
