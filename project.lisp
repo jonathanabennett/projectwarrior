@@ -167,7 +167,7 @@ slug: description"
       #'(lambda (p)
           (if (id diff) (setf (id p) (id diff)))
           (if (description diff) (setf (description p) (description diff)))
-          (if (slug diff) (setf (slug p) (slug diff)))
+          (if (not (string= (slug diff) "")) (setf (slug p) (slug diff)))
           (if (area-of-focus diff) (setf (area-of-focus p) (area-of-focus diff))) (if (tags diff) (setf (tags p) (union (tags p) (tags diff) :test #'string=)))
           (if (inherit-tags diff) (setf (inherit-tags p) (union (inherit-tags p) (inherit-tags diff) :test #'string=)))
           (if (filepath diff) (setf (filepath p) (filepath diff)))
@@ -204,6 +204,8 @@ Returns:
     (if input-description
         (setf input-description (format nil "~{~A~^ ~}" input-description))
         (setf input-description nil))
+    (if (not input-slug)
+        (setf input-slug ""))
     (setf proj (make-project  :uuid input-uuid
                               :area-of-focus input-area
                               :tags input-tags
