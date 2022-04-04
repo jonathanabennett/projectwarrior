@@ -198,3 +198,16 @@ Returns:
                               :id input-id
                               :description (format nil "~{~A~^ ~}" input-description)))
     (values proj input-remove-tags input-remove-inherit-tags input-source)))
+
+(defun tasks (project)
+  (uiop:run-program (format nil "task project.is:~A and '(status:PENDING or status:WAITING)' rc.hooks=off" (slug project)) :ignore-error-status t :output t))
+
+(defun new (projects task-list)
+  (let ((task-string (format nil "~{~A~^ ~}" task-list)))
+    (if (cdr projects)
+        (write-string "Please select only 1 project to add a task to.")
+        (add-taskwarrior task-string
+                         (format nil "~{~a~^ ~}"
+                                 (append (list (format nil "project:~a" (slug (car projects))))
+                                         (loop for tag in (inherit-tags (car projects))
+                                               collect (format nil "+~a" tag))))))))

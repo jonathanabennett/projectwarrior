@@ -6,7 +6,7 @@
 
 (in-package #:projectwarrior)
 
-(defvar *valid-commands* '("add" "done" "delete" "del" "modify" "mod" "review" "help"))
+(defvar *valid-commands* '("add" "done" "delete" "del" "modify" "mod" "review" "help" "tasks" "new"))
 
 (defun add-from-string (project-data)
   "This is used when adding from a string rather than a list."
@@ -106,6 +106,8 @@ the project(s) being modified."
           ((string= command "mod") (update-projects (filter-projects filter) modifications))
           ((string= command "done") (complete-projects (filter-projects filter)))
           ((string= command "delete") (delete-projects (filter-projects filter)))
+          ((string= command "new") (new (filter-projects filter) modifications))
+          ((string= command "tasks") (tasks-reporter (filter-projects filter)))
           ((string= command "review") (review-dispatcher modifications))
           ((string= command "view") (format-table (filter-projects filter) t))
           ((member command *reports-list* :test #'string= :key #'(lambda (x) (report-name x)))
@@ -114,6 +116,10 @@ the project(s) being modified."
                                                     :key #'(lambda (x) (report-name x))))))
           ((string= command "help") (help))
           (t (format-table (filter-projects filter) t)))))
+
+(defun tasks-reporter (projects)
+  (dolist (p projects)
+    (tasks p)))
 
 (defun review-dispatcher (input)
   "Select the review to conduct based on user input. In the case there is no input, give them the
@@ -129,8 +135,8 @@ the project(s) being modified."
   (multiple-value-bind (filt block-tags block-inherit-tags source) (project-from-list filter)
     (cond
       ((string= source "active") (search-projects (where filt) *active-projects-list*))
-      ((string= source "completed") (search-projects (where filt) *completed-projects-list))
-      ((string= source "deleted") (search-projects (where filt) *deleted-projects-list))
+      ((string= source "completed") (search-projects (where filt) *completed-projects-list*))
+      ((string= source "deleted") (search-projects (where filt) *deleted-projects-list*))
       (t (search-projects (where filt) *active-projects-list*)))))
 
 (defun complete-projects (projects)
