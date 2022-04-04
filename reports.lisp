@@ -4,6 +4,11 @@
 
 (in-package :projectwarrior)
 
+(defun has-file? (project)
+  (if (filepath project)
+      "True"
+      "False"))
+
 (defstruct report
   name
   column-labels
@@ -13,16 +18,16 @@
 (defvar *reports-list* '())
 
 (defun register-report (&key name col-labels col-functions col-align)
-  (push (make-report :name name
+  (pushnew (make-report :name name
                      :column-labels col-labels
                      :column-functions col-functions
                      :column-align col-align)
-        *reports-list*))
+        *reports-list* :test #'string= :key #'(lambda (x) (report-name x))))
 
 (defvar *default-report* (make-report :name "Default"
-                                      :column-labels '("#" "Slug" "Description" "Area of Focus" "tags")
-                                      :column-functions '(id slug description area-of-focus tags)
-                                      :column-align (loop for i from 1 to 5 collect :left)))
+                                      :column-labels '("#" "Slug" "Description" "Area of Focus" "tags" "file?")
+                                      :column-functions '(id slug description area-of-focus tags has-file?)
+                                      :column-align (loop for i from 1 to 6 collect :left)))
 
 (alexandria:define-constant +cell-formats+ '(:left   "~vA"
                                              :center "~v:@<~A~>"
