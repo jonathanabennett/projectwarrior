@@ -6,19 +6,22 @@
 
 This is a simple command line project management tool. Users can enter the projects along with metadata about the projects and track them through to completion. It integrates with taskwarrior for tracking the tasks within those projects, but could be integrated manually with another tool if you wanted.
 
+See our [wiki](https://github.com/jonathanabennett/projectwarrior/wiki) for more details!
+
 ## License
 
 MIT
 
 ## Installation
 
-### Prerequisites
+### [Prerequisites](https://github.com/jonathanabennett/projectwarrior/wiki/prerequisites)
 
 Projectwarrior is written in Common Lisp and requires a basic Common Lisp setup in order to run. Ensure that the following are correctly configured on your system:
 
 1. [sbcl](http://www.sbcl.org/index.html) Steel Bank Common Lisp (Projectwarrior should work with other Common Lisps, but has not been tested).
 2. [Quicklisp](https://www.quicklisp.org/beta/), the package manager for Common Lisp. This is used to download and install any 3rd party Common Lisp systems needed for Projectwarrior to run.
 
+### [Installation](https://github.com/jonathanabennett/projectwarrior/wiki/install)
 Once you have SBCL and Quicklisp setup according to the instructions on their website, follow the steps below to install Projectwarrior.
 
 1. Clone the repository into your local-projects folder (typically `~/quicklisp/local-projects`).
@@ -26,6 +29,8 @@ Once you have SBCL and Quicklisp setup according to the instructions on their we
 3. `make install` to copy the `projectwarrior` executable to `~/.bin`. If you need it to be elsewhere to be on your path, please skip this step and manually copy it.
 
 ## Usage
+
+Below is a quick summary with examples for every command. More details can be found in the wiki, particularly the [philosophy](https://github.com/jonathanabennett/projectwarrior/wiki/philosophy) and [examples](https://github.com/jonathanabennett/projectwarrior/wiki/examples) pages, which get updated regularly.
 
 ### Add
 
@@ -37,6 +42,7 @@ Once you have SBCL and Quicklisp setup according to the instructions on their we
 - Area of Focus: An Area of Focus is a short (like a slug) tag indicating which part of your life this task belongs to. For further details, see Tiago Forte's PARA method or David Allen's Getting Things Done. Areas are identified by `area:<string>`. For example: `area:relationships`, `area:professional`, or `area:side-hustle`.
 - Tags: Tags are used to classify projects. Tags are added as `+<string>`. Examples could include `+@office`, `+high-priority`, or `+vacation-home`. The primary use for tags is to filter your projects for the `project view` command. For example, if you are at work you might say `project +@office view` so you do not see any projects from your vacation home.
 - Inherited Tags: Inherited tags are tags which get applied by default to all tasks created in taskwarrior by projectwarrior. They are identified by `++<string>`. For example, if you have a project that needs to appear at the top of your `task next` report, you may give that project the `++next` tag so that every task you create for that task automatically has the `next` tag applied to it. To remove a tag for an individual task (maybe this task within the project doesn't need to be urgently), simply put `-next` in the task description and the two will cancel each other out.
+- Filepath: Filepath points to a file on the computer which contains notes about a project. It is added or modified by `file:path/to/file`. File can be any type which can be edited by your $EDITOR.
 - Description: Anything not collected by the filters above becomes part of the Description. Beware of putting characters in your project which have special meanings on the command line. I like to make this an imperative sentence (`Launch new marketing campaign`), but you may find a descriptive sentence fits better (`The new marketing campaign is successful.`)
 
 Examples:
@@ -83,15 +89,27 @@ If there are more than 3 projects which will be affected, you will be prompted f
 
 Example Calls:
 
-`project 14 delete`
+`project id:14 delete`
 
 `project Sales Calls delete`
 
-### View
+### New 
+`project <filter> new <task>` adds a task via taskwarrior whose project string is the slug of the project matching `<filter>`. Filter must match exactly 1 project, I recommend selecting via the `id` field.
 
-`project <filter> view` will show a tabular view of all projects matching `<filter>`. The ID numbers shown there can be used to complete or delete those tasks.
+Example Calls:
+
+`project id:14 new Call Acme Engineering +next due:tuesday`
+
+### Open
+`project <filter> open` will check to see if the task has a filepath associated with it. If it does, it will open that file with your shell's $EDITOR environmental variable. This is used for storing project notes in a convenient to access place. Future versions may create files according to templates.
+
+### Reports
+
+`project <filter> <report_name>` will show a tabular view of all projects matching `<filter>` formatted according to the report matching `<report_name>`. The ID numbers shown there can be used to complete or delete those tasks.
 
 Running `project` will show a complete list of all your projects. Running `project <filter>` will show a list of projects matching `<filter>`.
+
+Reports included are the default report (called `view`) and `count` which gives you a count of how many tasks are associated with each project in taskwarrior. Additional reports can be written according to the guidelines in the [configuration](https://github.com/jonathanabennett/projectwarrior/wiki/config) page of the wiki.
 
 Examples Calls:
 
@@ -99,7 +117,7 @@ Examples Calls:
 
 `project`
 
-`project area:professional`
+`project area:professional count`
 
 ### Review
 
@@ -162,11 +180,9 @@ The purpose of this program is to use taskwarrior (or other todo managers) to tr
 - Change the `view` display to make it easier to read and more compact.
 - Allow some customization by users of the `view` display
 
-### 0.3.2 Expanded Reviews
+### 0.3.2 Supporting Documents for Projects
 
-- Create a `project open` command which opens a file containing project support information. Write the initial connectors using `org-roam-protocol`, `org-protocol` and a simple `notes` folder.
-- Pull reviews out of the "compiled" portion of the program so that they are user-configurable.
-- Allow the users to create and register their own reviews using their config file.
+- Create a `project open` command which opens a file containing project support information.
 
 ### 0.4 Documentation and Demonstration 
 
@@ -176,6 +192,9 @@ At this point, the core features of the program will be complete enough to begin
 - Creating a series of videos demonstrating various use cases.
 - Writing detailed documentation which appears on Github as a wiki and is downloaded with the program as markdown files.
 
+### 0.4.1 Expanded Reviews
+- Pull reviews out of the "compiled" portion of the program so that they are user-configurable.
+- Allow the users to create and register their own reviews using their config file.
 
 ### And Beyond!
 
