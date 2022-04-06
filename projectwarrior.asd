@@ -4,7 +4,7 @@
   :description "GTD Review is a guided walk through your GTD Weekly Review that works with taskwarrior."
   :author "Jonathan A. Bennett <doulos05@gmail.com>"
   :license "MIT"
-  :version "0.3.1"
+  :version "0.3.2"
   :serial t
   :depends-on ("cl-ascii-table" "cl-ansi-text" "uuid" "cl-slug" "cl-json" "cl-utilities")
   :components
