@@ -40,4 +40,5 @@ build:
 
 install:
 	mv projectwarrior ~/.bin/project
+	cp -f default_config.lisp ~/.projectrc
 # end
