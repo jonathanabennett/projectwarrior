@@ -6,7 +6,7 @@
 
 (in-package #:projectwarrior)
 
-(defvar *valid-commands* '("add" "done" "delete" "del" "modify" "mod" "review" "help" "tasks" "new" "open"))
+(defvar *valid-commands* '("add" "done" "delete" "del" "modify" "mod" "review" "help" "tasks" "new" "open") "The list of valid commands.")
 
 (defun add-from-string (project-data)
   "This is used when adding from a string rather than a list."
